@@ -28,8 +28,8 @@ projectExam=myclient["projectExam"]
 sched = BackgroundScheduler()
 
 def job(name):
-    sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # scrapy脚本執行
-    os.system("scrapy crawl "+name)
+    # sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # scrapy脚本執行
+    os.system("cd /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask && scrapy crawl "+name)
 
 def doWeek(lis):
     for i in lis:
