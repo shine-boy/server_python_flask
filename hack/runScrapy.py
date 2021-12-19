@@ -3,7 +3,7 @@ import datetime
 import os
 import sys
 # linux下包导入失败
-path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+path = os.path.abspath('../..')
 sys.path.append(path)  # 会追加到列表最尾部
 from hack.util import isNull
 import pymongo
