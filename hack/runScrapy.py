@@ -2,9 +2,11 @@
 import datetime
 import os
 import sys
+
 # linux下包导入失败
-path = os.path.abspath('../..')
+path = os.path.abspath('./..')
 sys.path.append(path)  # 会追加到列表最尾部
+print(path)
 from hack.util import isNull
 import pymongo
 from hack.include.timeManager import TimeManager
