@@ -94,8 +94,8 @@ class WanYiYun():
         self.c="00e0b509f6259df8642dbc35662901477df22677ec152b5ff68ace615bb7b725152b3ab17a876aea8a5aa76d2e417629ec4ee341f56135fccf695280104e0312ecbda92557c93870114af6c9d05c4f7f0c3685b7a46bee255932575cce10b424d813cfe4875d3e82047b97ddef52741d546b8e289dc6935b3ece0462db0a22b8e7"
         self.i=createSecretKey(16)  #get_i.call('a',16)#随机生成长度为16的字符串
         self.iv = "0102030405060708"  # 偏移量
-        if not os.path.exists("d:/music"):
-            os.mkdir('d:/music')
+        # if not os.path.exists("d:/music"):
+        #     os.mkdir('d:/music')
         self.headers={  'User-Agent':set_user_agent(),
                         'Referer':'https://music.163.com/',
                         'Content-Type':'application/x-www-form-urlencoded'
