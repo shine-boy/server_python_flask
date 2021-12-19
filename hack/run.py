@@ -1,8 +1,8 @@
 
 
-from hack.spider.jipiao import Jipiao
+from .spider.jipiao import Jipiao
 from datetime import datetime,date
-from hack.include.myIterator import MyIterator
+from .include.myIterator import MyIterator
 import calendar
 import math
 

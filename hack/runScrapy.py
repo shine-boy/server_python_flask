@@ -1,19 +1,23 @@
 # coding=utf-8
 import datetime
-from hack.util import isNull
+import os
+import sys
+# linux下包导入失败
+path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+sys.path.append(path)  # 会追加到列表最尾部
+from .util import isNull
 import pymongo
-from hack.include.timeManager import TimeManager
+from .include.timeManager import TimeManager
 import threading
 from wsgiref.simple_server import make_server
 import json
 import math
-from hack.include import Stock,Page
+from .include import Stock,Page
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
 from flask import Response, Flask, request
 from flask_cors import CORS
-import os
 import hack.include.rili as rili
 app = Flask(__name__)
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")

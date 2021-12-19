@@ -1,7 +1,7 @@
 # coding:utf-8
-from hack.include import list as  my_list
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
+import os
 import threading
 # 执行队列
 class TimeManager:
@@ -64,6 +64,7 @@ if __name__=='__main__':
     sched.add_job(job, 'interval', id='3_second_job', seconds=3)
     sched.start()
     sched.add_job(job4, 'interval', id='4_second_job', seconds=4)
+    print()
     while (True):
         print('main 1s')
         time.sleep(1)
