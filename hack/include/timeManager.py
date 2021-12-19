@@ -64,6 +64,7 @@ if __name__=='__main__':
     sched.add_job(job, 'interval', id='3_second_job', seconds=3)
     sched.start()
     sched.add_job(job4, 'interval', id='4_second_job', seconds=4)
+    print(os.path.dirname(os.path.abspath(__file__)))
     while (True):
         print('main 1s')
         time.sleep(1)

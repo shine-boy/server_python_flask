@@ -28,6 +28,7 @@ projectExam=myclient["projectExam"]
 sched = BackgroundScheduler()
 
 def job(name):
+    sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # scrapy脚本執行
     os.system("scrapy crawl "+name)
 
 def doWeek(lis):
@@ -53,7 +54,7 @@ def getStartTime(startTime,day=0,hours=0,minute=0,second=0):
 def dowangyiyun():
     print('rere')
     # os.system("cd E:\git\/bigData && scrapy crawl wangyiyun")
-    os.system("scrapy crawl wangyiyun")
+    job('wangyiyun')
 
 
 def dongfangcaifu():
