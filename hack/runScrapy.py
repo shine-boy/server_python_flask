@@ -5,14 +5,14 @@ import sys
 # linux下包导入失败
 path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 sys.path.append(path)  # 会追加到列表最尾部
-from .util import isNull
+from hack.util import isNull
 import pymongo
-from .include.timeManager import TimeManager
+from hack.include.timeManager import TimeManager
 import threading
 from wsgiref.simple_server import make_server
 import json
 import math
-from .include import Stock,Page
+from hack.include import Stock,Page
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
