@@ -64,7 +64,7 @@ class BigdataPipeline(object):
 
         print(self.collection)
         self.collection.delete_many({'id':item["id"]})
-        self.collection.insert(dict(item))
+        self.collection.insert_one(dict(item))
         return item
 
     # def process_item(self, item, spider):
