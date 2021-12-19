@@ -4,9 +4,9 @@ import os
 import sys
 
 # linux下包导入失败
-path = os.path.abspath('./..')
-sys.path.append(path)  # 会追加到列表最尾部
-print(path)
+# path = os.path.abspath('./..')
+sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # 会追加到列表最尾部
+
 from hack.util import isNull
 import pymongo
 from hack.include.timeManager import TimeManager
