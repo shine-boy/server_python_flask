@@ -22,7 +22,7 @@ from flask import Response, Flask, request
 from flask_cors import CORS
 import hack.include.rili as rili
 app = Flask(__name__)
-myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
 mydb = myclient["local"]
 projectExam=myclient["projectExam"]
 sched = BackgroundScheduler()
