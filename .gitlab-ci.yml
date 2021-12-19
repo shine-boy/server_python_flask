@@ -24,7 +24,7 @@ build-job:
     - sss
   stage: build
   script:
-    - sudo pyinstaller hack/runScrapy.py
+    - sudo pyinstaller -F hack/runScrapy.py
     - sudo -S cp -r -p ./dist/* /var/myClient/pythonFlask
     - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/build
     - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/dist
