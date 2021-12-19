@@ -1,0 +1,9 @@
+������������ȡ�ű�
+
+pymongo
+Scrapy
+APScheduler
+Flask
+Flask-Cors
+requests-html
+PyExecJS

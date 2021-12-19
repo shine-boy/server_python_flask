@@ -1,0 +1,9 @@
+.idea
+.git
+venv
+.vscode
+*.csv
+/dist/*
+/build/*
+/hack/binary/data
+**/logs

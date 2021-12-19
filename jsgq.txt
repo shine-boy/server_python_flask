@@ -1,0 +1,98 @@
+Exception:list index out of range   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list index out of range   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list index out of range   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list index out of range   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list index out of range   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list index out of range   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:int() argument must be a string, a bytes-like object or a number, not 'NoneType'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'list' object has no attribute 'extract_first'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'list' object has no attribute 'extract_first'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'list' object has no attribute 'extract_first'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object has no attribute 'extract_first'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:getTd() missing 2 required positional arguments: 'item' and 'obj'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'dict' object has no attribute 'has_key'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list indices must be integers or slices, not str   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list indices must be integers or slices, not str   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list indices must be integers or slices, not str   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list indices must be integers or slices, not str   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list indices must be integers or slices, not str   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list indices must be integers or slices, not str   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:list indices must be integers or slices, not str   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:getStr() missing 1 required positional argument: 'obj'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:getTd() missing 2 required positional arguments: 'item' and 'obj'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object does not support indexing   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:object of type 'Selector' has no len()   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'Selector' object is not iterable   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:[Errno 2] No such file or directory: '../data/models.text'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:[Errno 2] No such file or directory: '../data/models.text'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:[Errno 2] No such file or directory: '../data/models.text'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:[Errno 2] No such file or directory: '../data/models.txt'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:[Errno 2] No such file or directory: '../data/models.txt'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:[Errno 2] No such file or directory: '../data/models.txt'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:[Errno 2] No such file or directory: '../data/models.txt'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'str' object has no attribute 'get'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'str' object has no attribute 'get'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'str' object has no attribute 'get'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'str' object has no attribute 'get'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'str' object has no attribute 'get'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:'str' object has no attribute 'get'   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html
+Exception:must be str, not TypeError   url:http://www.jscq.com.cn/dsf/gq/jygg/202006/t20200629_28085.html

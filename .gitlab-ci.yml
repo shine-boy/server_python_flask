@@ -1,0 +1,42 @@
+
+cache: &global_cache
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+  # 缓存
+    - node_modules
+
+stages: # 分段
+#  - install
+  # - eslint
+  - build
+  - start
+
+#install:
+#  tags:
+#    - sss
+#  stage: install
+#  script:
+#    - sudo pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
+
+
+build-job:
+  tags:
+    - sss
+  stage: build
+  script:
+    - sudo pyinstaller hack/runScrapy.py
+    - sudo -S cp -r -p ./dist/* /var/myClient/pythonFlask
+    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/build
+    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/dist
+
+deploy-job:
+  tags:
+    - sss
+  stage: start
+  script:
+    - sudo systemctl stop python_flask.service
+    - sudo systemctl start python_flask.service
+    - sudo -S cp -r -p ./dist/* /var/myClient/pythonFlask
+    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/build
+    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/dist
+    # - rsync -r --delete ./dist root@xxx.xxx.xxx.xxx:/usr/share/nginx/html
