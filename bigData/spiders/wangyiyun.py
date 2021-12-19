@@ -34,7 +34,7 @@ class wangyiyun(scrapy.Spider):
     def parse(self, response):
         lis = json.loads(response.xpath('//textarea[@id="song-list-pre-data"]').xpath("string(.)").extract_first())
         url='https://music.163.com/#'
-        for li in lis[:1]:
+        for li in lis:
             artists=li['artists']
             name=li["name"]
             id=li["id"]

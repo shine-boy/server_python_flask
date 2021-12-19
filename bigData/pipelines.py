@@ -61,8 +61,6 @@ class BigdataPipeline(object):
         # data.to_csv(path,index=False)
         # print(item)
         item['time']=datetime.datetime.now()
-
-        print(self.collection)
         self.collection.delete_many({'id':item["id"]})
         self.collection.insert_one(dict(item))
         return item
