@@ -8,7 +8,7 @@ cache: &global_cache
 stages: # 分段
 #  - install
   # - eslint
-  - build
+#  - build
   - start
 
 #install:
@@ -19,23 +19,24 @@ stages: # 分段
 #    - sudo pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
 
 
-build-job:
-  tags:
-    - sss
-  stage: build
-  script:
-    - sudo pyinstaller -F hack/runScrapy.py
-    - sudo -S cp -r -p ./dist/* /var/myClient/pythonFlask
-    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/build
-    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/dist
+#build-job:
+#  tags:
+#    - sss
+#  stage: build
+#  script:
+##    - sudo pyinstaller -F hack/runScrapy.py
+##    - sudo -S cp -r -p ./dist/* /var/myClient/pythonFlask
+#    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/build
+#    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/dist
 
 deploy-job:
   tags:
     - sss
   stage: start
   script:
-    - sudo systemctl stop python_flask.service
-    - sudo systemctl start python_flask.service
+#    - sudo systemctl stop python_flask.service
+#    - sudo systemctl start python_flask.service
+    - python3 /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/hack/runScrapy.py
     - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/build
     - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/dist
     # - rsync -r --delete ./dist root@xxx.xxx.xxx.xxx:/usr/share/nginx/html

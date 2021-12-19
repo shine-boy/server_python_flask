@@ -10,7 +10,8 @@ class fund(scrapy.Spider):
 
     def __init__(self):
         myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
-        self.mydb = myclient["fund"]
+        db = myclient["stock_fund"]
+        self.mydb = db['fund']
         self.url = 'http://fund.eastmoney.com/Data/Fund_JJJZ_Data.aspx'
         self.obj = {
             0: 'code',
@@ -58,12 +59,10 @@ class fund(scrapy.Spider):
         res=demjson.decode(text[text.find("{"):])
         pages = int(res['pages'])
 
-        print(response.url)
         for i in range(1,pages + 1):
             params['page'] = str(i) + ',200'
             url = self.url + "?" + parse.urlencode(params)
             yield scrapy.Request(url=url, dont_filter=True, callback=self.parse)
-            print(i)
 
     # 获取数据，存数
     def parse(self, response):
@@ -78,7 +77,6 @@ class fund(scrapy.Spider):
                 temp[key] = data[key]
             temp['data'] = showDay[0]
             self.mydb.insert_one(temp)
-        print(showDay)
 
 
 

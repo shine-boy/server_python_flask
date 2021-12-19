@@ -56,6 +56,11 @@ def dowangyiyun():
     # os.system("cd E:\git\/bigData && scrapy crawl wangyiyun")
     job('wangyiyun')
 
+# 基金
+def dofund():
+    print('rere')
+    # os.system("cd E:\git\/bigData && scrapy crawl wangyiyun")
+    job('dfcf_fund')
 
 def dongfangcaifu():
     print('tests')
@@ -92,8 +97,6 @@ def do_dongfangcaifu():
 
 def doSched():
     print('start')
-    print(mydb)
-    print(mydb["comments"])
     schedList = {
         '网易云':{
             'func': dowangyiyun,
@@ -102,6 +105,15 @@ def doSched():
                 'days': 1,
                 'misfire_grace_time': 3600,
                 'start_date': getStartTime(datetime.datetime(2021, 2, 2, 18, 0, 0),day=1)
+            }
+        },
+        '基金': {
+            'func': dofund,
+            'args': {
+                'type': 'cron',
+                'day_of_week': "0-4",
+                'misfire_grace_time': 3600,
+                'hour': '19'
             }
         }
     }
