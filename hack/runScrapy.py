@@ -95,15 +95,15 @@ def doSched():
     print(mydb)
     print(mydb["comments"])
     schedList = {
-        # '网易云':{
-        #     'func': dowangyiyun,
-        #     'args': {
-        #         'type': 'interval',
-        #         'days': 1,
-        #         'misfire_grace_time': 3600,
-        #         'start_date': getStartTime(datetime.datetime(2021, 2, 2, 18, 0, 0),day=1)
-        #     }
-        # }
+        '网易云':{
+            'func': dowangyiyun,
+            'args': {
+                'type': 'interval',
+                'days': 1,
+                'misfire_grace_time': 3600,
+                'start_date': getStartTime(datetime.datetime(2021, 2, 2, 18, 0, 0),day=1)
+            }
+        }
     }
     timeManager = TimeManager()
     for key in schedList.keys():
