@@ -102,7 +102,7 @@ def doSched():
             'func': dowangyiyun,
             'args': {
                 'type': 'interval',
-                'days': 1,
+                'days': 7,
                 'misfire_grace_time': 3600,
                 'start_date': getStartTime(datetime.datetime(2021, 2, 2, 18, 0, 0),day=1)
             }
