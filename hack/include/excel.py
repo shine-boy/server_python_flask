@@ -179,15 +179,25 @@ class Table:
                     raise Exception('fd')
 
 
-
+def fileToBBytes(file):
+    filename = file.read()
+    # with open(filename, 'rb', encoding='gbk') as inputFile:
+    #
+    #     return inputFile.read()
+    # filename = filename.decode('utf-8', 'ignore')
+    return filename
 
 
 
 # 消化内科数据
-def consume(defaultName,defaultHead,defaultFilter):
+def consume(defaultName,defaultHead,defaultFilter, file = None):
     # filename = 'C:\\Users\wu\Desktop\\test.xlsx';
     filename = 'C:\\Users\wu\Documents\WeChat Files\wxid_iu41h1yc1i9422\FileStorage\File\\2021-11\消化内科数据.xlsx'
-    book = xlrd.open_workbook(filename)
+
+    if file:
+        filename = fileToBBytes(file)
+
+    book = xlrd.open_workbook(filename, file_contents=filename)
 
     # 筛选
     def filter(head, data):
@@ -762,6 +772,7 @@ def consume(defaultName,defaultHead,defaultFilter):
         pass
 
     result = xlwt.Workbook()
+
     sheetIndex = 1
     # 汇总表，取header第一层数据
     for key in header.keys():
@@ -800,10 +811,14 @@ def consume(defaultName,defaultHead,defaultFilter):
     #     for j in range(len(rows[i])):
     #         sh.write(i, j, label=rows[i][j])
     name = defaultName if defaultName else 'testt123'
-    saveFile = 'C:\\Users\wu\Desktop' + "/" + name + '.xls'
+    if file:
+        name = file.name
+    saveFile = "./" + name + '.xls'
     if os.path.isfile(saveFile):
         os.remove(saveFile)
     result.save(saveFile)
+    with open(saveFile, 'rb') as inputFile:
+        return inputFile.read()
 
 
     # # sheet.put_cell(1, 1, 1, "test", 0)
@@ -819,7 +834,7 @@ def consume(defaultName,defaultHead,defaultFilter):
     # print(fd['A1'])
 
 # 疾病
-def jibing():
+def jibing(file=None):
     filter_ = [
         {
             'title': '小于39',
@@ -1305,10 +1320,10 @@ def jibing():
             'data': [],
             'rows': [],
         })
-    consume(defaultName='疾病分类', defaultHead=header,defaultFilter=filter_);
+    return consume(defaultName='疾病分类', defaultHead=header,defaultFilter=filter_, file= file);
 
 # 外科诊室
-def waike():
+def waike(file=None):
     filter_ = [
         {
             'title': '小于39',
@@ -1592,7 +1607,7 @@ def waike():
             ]
 
     }
-    consume(defaultName='外科诊室', defaultHead=header,defaultFilter=filter_);
+    return consume(defaultName='外科诊室', defaultHead=header,defaultFilter=filter_, file=file);
 
 if __name__ == '__main__':
    consume()

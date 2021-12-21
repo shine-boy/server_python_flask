@@ -28,4 +28,5 @@ if __name__ == '__main__':
     # getMinJiPiao()
     jip = Jipiao()
     print(jip.getMin())
+    # print(jip.getJiPiaos(space=['2021-12-21', '2021-12-27']))
     pass

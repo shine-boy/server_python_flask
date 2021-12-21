@@ -6,7 +6,7 @@ import sys
 # linux下包导入失败
 # path = os.path.abspath('./..')
 sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # 会追加到列表最尾部
-
+import hack.include.excel as myExcel
 from hack.util import isNull
 import pymongo
 from hack.include.timeManager import TimeManager
@@ -18,7 +18,7 @@ from hack.include import Stock,Page
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
-from flask import Response, Flask, request
+from flask import Response, Flask, request, make_response
 from flask_cors import CORS
 import hack.include.rili as rili
 app = Flask(__name__)
@@ -244,6 +244,23 @@ def seachprojectExam():
     response=Response()
     response.headers={"Access-Control-Allow-Origin":"*"}
     response.data=json.dumps(result)
+    return response
+
+@app.route('/uploadProjectExel', methods=['POST'])
+def uploadProjectExel():
+
+    my_file = request.files['file']
+    print(my_file)
+    data = None
+    if request.data:
+        data = json.loads(request.data)
+    if data and data.get('type') == '1':
+        resfile = myExcel.waike(my_file)
+    else:
+        resfile = myExcel.jibing(my_file)
+
+    response=make_response(resfile)
+    response.headers={"Access-Control-Allow-Origin":"*"}
     return response
 
 #英文翻译，保存至englishdic

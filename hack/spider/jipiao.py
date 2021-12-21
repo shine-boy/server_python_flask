@@ -4,8 +4,9 @@ import json
 from datetime import datetime,date
 import calendar
 import math
-from  hack.util import MyIterator,getKeys_dic
-
+import re
+from hack.include.myIterator import MyIterator
+from hack.util import getKeys_dic
 
 class Jipiao:
 
@@ -14,7 +15,8 @@ class Jipiao:
             now=datetime.now()
         if type(now) is str:
             try:
-                now=datetime.fromisoformat(now)
+
+                now=datetime(*[int(a) for a in re.split('\D', now)])
 
             except ValueError as v:
                 print(v+":输入时间格式错误，默认使用当前时间")
@@ -114,7 +116,7 @@ class Jipiao:
         for i in range(len(times)):
             if type(times[i]) is str:
                 try:
-                    times[i]= datetime.fromisoformat(times[i])
+                    times[i]= datetime(*[int(a) for a in re.split('\D', times[i])])
                 except ValueError as v:
                     print(v + ":输入时间格式错误")
                     times=[]
@@ -125,7 +127,7 @@ class Jipiao:
         start= self.to_time(start)
         year = start.year
         month = start.month
-        monthlen = calendar._monthlen(year, month)
+        monthlen = calendar.monthrange(year, month)[1]
         for i in range(l):
             day = (start.day + i)
             if day > monthlen:
@@ -162,16 +164,16 @@ class Jipiao:
         min = 10000
         temp = {}
         for i in self.getJiPiao(keys=None, do=self.xiuCheng, citys=citys):
-            for ti in self.getTimes("2021-02-07", 3):
+            for ti in self.getTimes("2021-12-20", 40):
                 for n in i:
-
-                    if ti == datetime.fromisoformat(n.get("departureDate")):
+                    if ti == datetime(*[int(a) for a in re.split('\D', n.get("departureDate"))]):
                         result.append(n)
 
-        for re in result:
-            if re.get('price') < min:
-                min = re.get('price')
-                temp = re
+        for res in result:
+            if res.get('price') < min:
+                min = res.get('price')
+                temp = res
+        print(result)
         for ci in citys:
             if ci['data'].find(temp['departureCityCode']) > -1:
                 temp['departureCityCode'] = ci['display']
