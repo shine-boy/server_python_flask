@@ -818,6 +818,7 @@ def consume(defaultName,defaultHead,defaultFilter, file = None):
         os.remove(saveFile)
     result.save(saveFile)
     with open(saveFile, 'rb') as inputFile:
+        print(os.path.abspath(saveFile))
         return inputFile.read()
 
 
@@ -834,7 +835,7 @@ def consume(defaultName,defaultHead,defaultFilter, file = None):
     # print(fd['A1'])
 
 # 疾病
-def jibing(file=None):
+def jibing(file=None, filter=None, head=None):
     filter_ = [
         {
             'title': '小于39',
@@ -1320,10 +1321,10 @@ def jibing(file=None):
             'data': [],
             'rows': [],
         })
-    return consume(defaultName='疾病分类', defaultHead=header,defaultFilter=filter_, file= file);
+    return consume(defaultName='疾病分类', defaultHead=head or header,defaultFilter=filter or filter_, file= file);
 
 # 外科诊室
-def waike(file=None):
+def waike(file=None, filter=None, head=None):
     filter_ = [
         {
             'title': '小于39',
@@ -1607,7 +1608,7 @@ def waike(file=None):
             ]
 
     }
-    return consume(defaultName='外科诊室', defaultHead=header,defaultFilter=filter_, file=file);
+    return consume(defaultName='外科诊室', defaultHead=head or header,defaultFilter=filter or filter_, file=file);
 
 if __name__ == '__main__':
    consume()

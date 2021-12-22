@@ -248,19 +248,26 @@ def seachprojectExam():
 
 @app.route('/uploadProjectExel', methods=['POST'])
 def uploadProjectExel():
+    try:
+        my_file = request.files['file']
+        # print(my_file)
+        data = None
+        if request.form:
+            data = request.form.to_dict()
 
-    my_file = request.files['file']
-    print(my_file)
-    data = None
-    if request.data:
-        data = json.loads(request.data)
-    if data and data.get('type') == '1':
-        resfile = myExcel.waike(my_file)
-    else:
-        resfile = myExcel.jibing(my_file)
+        if data and data.get('type') == '1':
+            resfile = myExcel.jibing(my_file)
+        else:
+            resfile = myExcel.waike(my_file)
+    except Exception as e:
+        print(e)
+        pass
+    response = Response(resfile)
 
-    response=make_response(resfile)
-    response.headers={"Access-Control-Allow-Origin":"*"}
+    # response=make_response(resfile)
+
+    response.headers={"Access-Control-Allow-Origin":"*", 'Content-Type': "application/vnd.ms-excel"}
+    response.headers['Content-Disposition'] = 'attachment; filename=FileName.xls'
     return response
 
 #英文翻译，保存至englishdic
