@@ -256,9 +256,9 @@ def uploadProjectExel():
             data = request.form.to_dict()
 
         if data and data.get('type') == '1':
-            resfile = myExcel.jibing(my_file)
+            resfile = myExcel.jibing(my_file, head=data.get('header'), filter=data.get('filter'))
         else:
-            resfile = myExcel.waike(my_file)
+            resfile = myExcel.waike(my_file, head=data.get('header'), filter=data.get('filter'))
     except Exception as e:
         print(e)
         pass
