@@ -71,10 +71,10 @@ class fund(scrapy.Spider):
         showDay = res['showday']
         datas = res['datas']
         for i in range(len(datas)):
-            data = data[i]
+            data = datas[i]
             temp = {}
             for key in self.obj.keys():
-                temp[key] = data[key]
+                temp[str(key)] = data[key]
             temp['data'] = showDay[0]
             self.mydb.insert_one(temp)
 

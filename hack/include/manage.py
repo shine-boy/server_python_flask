@@ -147,12 +147,25 @@ def filter_mongo(mydb,collections=["choice","multiSelect"]):
                 raise Exception("ans 不能为空")
             collection.delete_one({"_id":li["_id"]})
             collection.insert_one(li)
+import urllib
+def find(name, params=None):
+    r = urllib.parse.quote_plus('root')
+    u = urllib.parse.quote_plus('w@1948322788')
+    myclient = pymongo.MongoClient("mongodb://"+"101.35.44.243:27017/")
+    print(myclient.database_names())
+    return
+    mydb = myclient[name]
+    collections = mydb.collection_names()
 
+    for key in collections:
+        print(key)
+
+        print(mydb.get_collection(key).find().count())
 if __name__ == "__main__":
-    myclient = pymongo.MongoClient("mongodb://192.168.142.1:27017/")
-    mydb = myclient["projectExam"]
+    find('local')
+
     # choice = mydb["choice"]
-    htmlTo_mongo("C:\\Users\liu_hfei\Desktop\\" + 'base64.txt', mydb)
+    # htmlTo_mongo("C:\\Users\liu_hfei\Desktop\\" + 'base64.txt', mydb)
     # with open("C:\\Users\liu_hfei\Desktop\\base64.txt",'r',encoding='GBK') as f:
     #     print(f.read())
     # paths=["test.html","CVICSE E-Learning系统.html","项目经理考试页面.htm"]
