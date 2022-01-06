@@ -7,6 +7,7 @@ from urllib import parse
 import threading
 import pymongo
 from hack.include import list as m_list
+import os
 # import hack.include as m_list
 import hack.util as util
 ts.set_token('7c797390e1c7caa6f79aadc01e4ad3577707f240c052f9b682f6782f')
@@ -274,11 +275,18 @@ class Stock:
 
 
 if __name__ == '__main__':
-    stock=Stock()
-    ti=time.time()
-    print(time.time())
-    # print(stock.stocks)
-    stock.do(stock.insert_mongo)
-    stock.waiter()
-    print(time.time()-ti)
+    # stock=Stock()
+    # ti=time.time()
+    #
+    # print()
+    # # print(stock.stocks)
+    # stock.do(stock.insert_mongo)
+    # stock.waiter()
+    # print(time.time()-ti)
+    te = os.system('netstat -nap')
+
+    # 查看端口对于进程 lsof -i:5000
+    # 杀死对应端口 kill -9 PID
+    # print(te)
+    print(type(te))
     # stock.marketAnalysis()
