@@ -8,21 +8,17 @@ class TimeManager:
     queues = []
     def __init__(self):
         self.sched = BackgroundScheduler()
-
-    # 启动
-    def run(self):
         self.sched.start()
-        pass
 
     # 执行需要执行得方法
     def run(self, name, func, args):
         type = args['type']
         del args['type']
-        @self.sched.scheduled_job(type, **args)
+        @self.sched.scheduled_job(type, **args, id=name)
         def do_func():
             func()
             pass
-        threading.Thread(target=do_func).start()
+        # threading.Thread(target=do_func).start()
         pass
 
     def find_queue_index(self, name):
@@ -60,11 +56,21 @@ def job():
 def job4():
     print('job 4s')
 if __name__=='__main__':
-    sched = BackgroundScheduler(timezone='MST')
-    sched.add_job(job, 'interval', id='3_second_job', seconds=3)
-    sched.start()
-    sched.add_job(job4, 'interval', id='4_second_job', seconds=4)
-    print(os.path.dirname(os.path.abspath(__file__)))
+    timeManager = TimeManager()
+    timeManager.run('test',job,{
+        'seconds': 3,
+        'type': 'interval'
+    })
+    timeManager.run('test4', job4, {
+        'seconds': 4,
+        'type': 'interval'
+    })
+
+    # sched = BackgroundScheduler(timezone='MST')
+    # sched.add_job(job, 'interval', id='3_second_job', seconds=3)
+    # sched.start()
+    # sched.add_job(job4, 'interval', id='4_second_job', seconds=4)
+    # print(os.path.dirname(os.path.abspath(__file__)))
     while (True):
         print('main 1s')
         time.sleep(1)

@@ -59,6 +59,8 @@ def dowangyiyun():
 # 基金
 def dofund():
     print('rere')
+    if not rili.isStockDeal():
+        return
     # os.system("cd E:\git\/bigData && scrapy crawl wangyiyun")
     job('dfcf_fund')
 
@@ -109,6 +111,15 @@ def doSched():
         },
         '基金': {
             'func': dofund,
+            'args': {
+                'type': 'cron',
+                'day_of_week': "0-4",
+                'misfire_grace_time': 3600,
+                'hour': '19'
+            }
+        },
+        '东方财富': {
+            'func': do_dongfangcaifu,
             'args': {
                 'type': 'cron',
                 'day_of_week': "0-4",

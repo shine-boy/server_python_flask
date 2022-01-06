@@ -46,6 +46,7 @@ def isWork(day=datetime.now()):
     return False
 
 # 判断是否是股票交易日
+# 不是工作日且不休息
 def isStockDeal(day=datetime.now()):
     data=getMonth()
     for da in data['data']:
