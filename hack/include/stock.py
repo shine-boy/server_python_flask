@@ -188,6 +188,7 @@ class Stock:
                     page+=1
                     get(item,page)
         menus=self.find(["沪深京板块",'概念板块'])
+        print(menus)
         for menu in menus:
             self.run(get,menu,1)
 
