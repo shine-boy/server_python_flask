@@ -6,7 +6,8 @@ from datetime import datetime
 from urllib import parse
 import threading
 import pymongo
-# import hack.include.list as m_list
+from hack.include import list as m_list
+# import hack.include as m_list
 import hack.util as util
 ts.set_token('7c797390e1c7caa6f79aadc01e4ad3577707f240c052f9b682f6782f')
 def get_realtime_quotes(code):
@@ -186,7 +187,7 @@ class Stock:
                         threadLock.release()
                     page+=1
                     get(item,page)
-        menus=self.find(["沪深板块",'概念板块'])
+        menus=self.find(["沪深京板块",'概念板块'])
         for menu in menus:
             self.run(get,menu,1)
 
