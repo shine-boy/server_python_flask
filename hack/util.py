@@ -25,7 +25,7 @@ def kill_port(port):
     resu = subprocess.Popen("lsof -i:" + port, shell=True, stdout=subprocess.PIPE)
     resu.wait()
     result = resu.stdout.read()
-    if result is None or result == '':
+    if result is None or result == b'':
         return
     print(result)
     result = str(result, encoding='gbk')
