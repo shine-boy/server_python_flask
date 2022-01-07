@@ -41,4 +41,5 @@ def kill_port(port):
     print(lis)
 
     pid_index = lis[0].index('PID')
-    os.system('kill -9 ' + lis[1][pid_index])
+    resu = subprocess.Popen('kill -9 ' + lis[1][pid_index], shell=True, stdout=subprocess.PIPE)
+    resu.wait()
