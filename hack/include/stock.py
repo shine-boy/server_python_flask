@@ -283,10 +283,11 @@ if __name__ == '__main__':
     # stock.do(stock.insert_mongo)
     # stock.waiter()
     # print(time.time()-ti)
-    te = os.system('netstat -nap')
+    # te = os.system('netstat -nap')
 
     # 查看端口对于进程 lsof -i:5000
     # 杀死对应端口 kill -9 PID
     # print(te)
-    print(type(te))
+
+    print()
     # stock.marketAnalysis()

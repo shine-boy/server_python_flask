@@ -7,7 +7,7 @@ import sys
 # path = os.path.abspath('./..')
 sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # 会追加到列表最尾部
 import hack.include.excel as myExcel
-from hack.util import isNull
+from hack.util import isNull, kill_port
 import pymongo
 from hack.include.timeManager import TimeManager
 import threading
@@ -341,6 +341,7 @@ if __name__ == '__main__':
     # while True:
     #     schedule.run_pending()
     #     time.sleep(1)
+    kill_port('5000')
     threading.Thread(target=doSched).start()
     server = make_server('0.0.0.0', 5000, app)
     server.serve_forever()
