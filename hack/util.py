@@ -29,7 +29,7 @@ def kill_port(port):
         return
     print(result)
     result = str(result, encoding='gbk')
-    lis = result.split('\r\n')
+    lis = result.split('\n')
     # É¾³ý ¿Õ°××Ö·û
     for i in range(len(lis)):
         lis[i] = lis[i].split(' ')
