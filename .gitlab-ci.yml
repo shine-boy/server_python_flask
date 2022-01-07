@@ -36,7 +36,7 @@ deploy-job:
   script:
 #    - sudo systemctl stop python_flask.service
 #    - sudo systemctl start python_flask.service
-    - sudo nohup python3 /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/hack/runScrapy.py
+    - sudo nohup python3 /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/hack/runScrapy.py > pythonlog.file 2>&1 &
 #    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/build
 #    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/dist
     # - rsync -r --delete ./dist root@xxx.xxx.xxx.xxx:/usr/share/nginx/html

@@ -55,15 +55,20 @@ def job():
 
 def job4():
     print('job 4s')
+
+import datetime
 if __name__=='__main__':
     timeManager = TimeManager()
     timeManager.run('test',job,{
         'seconds': 3,
+        'hours': 1,
         'type': 'interval'
     })
     timeManager.run('test4', job4, {
         'seconds': 4,
-        'type': 'interval'
+        'hours': 1,
+        'type': 'interval',
+        'start_date': datetime.datetime(2021, 2, 2, 18, 0, 0)
     })
 
     # sched = BackgroundScheduler(timezone='MST')
@@ -74,6 +79,7 @@ if __name__=='__main__':
     while (True):
         print('main 1s')
         time.sleep(1)
+
 # if __name__ == '__main__':
 #     print(my_list.findIndex([1],1))
 #     t = [{'name':'1'},{'name':2}]
