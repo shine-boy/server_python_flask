@@ -106,7 +106,7 @@ def doSched():
                 'type': 'interval',
                 'days': 7,
                 'misfire_grace_time': 3600,
-                'start_date': getStartTime(datetime.datetime(2021, 2, 2, 18, 0, 0),day=1)
+                'start_date': getStartTime(datetime.datetime(2021, 2, 2, 18, 0, 0),day=7)
             }
         },
         '基金': {
@@ -342,6 +342,7 @@ if __name__ == '__main__':
     #     schedule.run_pending()
     #     time.sleep(1)
     kill_port('5000')
+    time.sleep(3);
     threading.Thread(target=doSched).start()
     server = make_server('0.0.0.0', 5000, app)
     server.serve_forever()

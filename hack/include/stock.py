@@ -127,7 +127,7 @@ class Stock:
         self.threadingNum=maxthreading
 
 
-        myclient = pymongo.MongoClient("mongodb://192.168.142.1:27017/")
+        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
         self.mydb = myclient["dongfangcaifu"]
         self.url="http://6.push2.eastmoney.com/api/qt/clist/get"
         self.menu=self.get_menu()
@@ -157,6 +157,10 @@ class Stock:
         self.waiter()
         # self.threadingNum += threading.activeCount()
 
+    def __del__(self):
+        for i in self.threads:
+            pass;
+        self.threads.clear()
     def get_menu(self):
         url='http://quote.eastmoney.com/center/api/sidemenu.json'
         res=requests.get(url=url)
@@ -180,6 +184,7 @@ class Stock:
             res = requests.get(url)
             if res.status_code == 200:
                 data = json.loads(res.text[res.text.find("{"):-2])
+
                 if data.get('data') is not None:
                     for da in data.get('data').get("diff"):
                         threadLock.acquire()
@@ -189,7 +194,6 @@ class Stock:
                     page+=1
                     get(item,page)
         menus=self.find(["沪深京板块",'概念板块'])
-        print(menus)
         for menu in menus:
             self.run(get,menu,1)
 
@@ -266,6 +270,7 @@ class Stock:
         param['cb'] = 'jQuery112407522976605656146_' + str(int(current.timestamp()))
         url+="?"+parse.urlencode(param)
         res=requests.get(url=url,headers=self.headers)
+        print(res.text)
         if res.status_code == 200:
             data = json.loads(res.text[res.text.find("{"):-2])
             return data.get('data')
@@ -275,14 +280,16 @@ class Stock:
 
 
 if __name__ == '__main__':
-    # stock=Stock()
-    # ti=time.time()
+    stock=Stock()
+
+    ti=time.time()
     #
     # print()
-    # # print(stock.stocks)
-    # stock.do(stock.insert_mongo)
-    # stock.waiter()
-    # print(time.time()-ti)
+    print(stock.stocks)
+    # stock.insert_mongo('002038')
+    stock.do(stock.insert_mongo)
+    stock.waiter()
+    print(time.time()-ti)
     # te = os.system('netstat -nap')
 
     # 查看端口对于进程 lsof -i:5000
