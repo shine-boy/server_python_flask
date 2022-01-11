@@ -127,7 +127,7 @@ class Stock:
         self.threadingNum=maxthreading
 
 
-        myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+        myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
         self.mydb = myclient["dongfangcaifu"]
         self.url="http://6.push2.eastmoney.com/api/qt/clist/get"
         self.menu=self.get_menu()
