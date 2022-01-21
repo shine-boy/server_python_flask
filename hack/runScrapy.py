@@ -99,6 +99,7 @@ def do_dongfangcaifu():
 
 def doSched():
     print('start')
+    print(datetime.datetime.now())
     schedList = {
         '网易云':{
             'func': dowangyiyun,
@@ -131,8 +132,8 @@ def doSched():
     timeManager = TimeManager()
     for key in schedList.keys():
         timeManager.run(key, schedList[key]['func'], schedList[key]['args'])
-    threading.Thread(target=dongfangcaifu).start()
-    sched.start()
+    # threading.Thread(target=dongfangcaifu).start()
+    # sched.start()
 
 
 @app.before_first_request
