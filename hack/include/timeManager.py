@@ -61,12 +61,12 @@ if __name__=='__main__':
     timeManager = TimeManager()
     timeManager.run('test',job,{
         'seconds': 3,
-        'hours': 1,
+        # 'hours': 1,
         'type': 'interval'
     })
     timeManager.run('test4', job4, {
         'seconds': 4,
-        'hours': 1,
+        # 'hours': 1,
         'type': 'interval',
         'start_date': datetime.datetime(2021, 2, 2, 18, 0, 0)
     })
