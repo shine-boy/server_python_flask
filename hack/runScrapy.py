@@ -131,7 +131,7 @@ def doSched():
     timeManager = TimeManager()
     for key in schedList.keys():
         timeManager.run(key, schedList[key]['func'], schedList[key]['args'])
-    # threading.Thread(target=dongfangcaifu).start()
+    threading.Thread(target=dongfangcaifu).start()
     # sched.start()
 
 
