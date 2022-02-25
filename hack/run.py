@@ -26,7 +26,6 @@ def test():
         yield i
 if __name__ == '__main__':
     # getMinJiPiao()
-    print('test git hook')
     jip = Jipiao()
     print(jip.getMin())
     # print(jip.getJiPiaos(space=['2021-12-21', '2021-12-27']))
