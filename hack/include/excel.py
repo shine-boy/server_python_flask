@@ -191,7 +191,7 @@ def fileToBBytes(file):
 
 # 消化内科数据
 def consume(defaultName,defaultHead,defaultFilter, file = None):
-    # filename = 'C:\\Users\wu\Desktop\\test.xlsx';
+    # filename = 'C:\\Users\wu\Desktop\\servers_api.xlsx';
     filename = 'C:\\Users\wu\Documents\WeChat Files\wxid_iu41h1yc1i9422\FileStorage\File\\2021-11\消化内科数据.xlsx'
 
     if file:
@@ -822,14 +822,14 @@ def consume(defaultName,defaultHead,defaultFilter, file = None):
         return inputFile.read()
 
 
-    # # sheet.put_cell(1, 1, 1, "test", 0)
+    # # sheet.put_cell(1, 1, 1, "servers_api", 0)
     # print(sheet.row(0))
     # # for i in range(sheet.nrows):
     # #     row = sheet.row_values(i)
     # #     print(i, row)
     # #     count += 1
-    # test=openpyxl.open('C:\\Users\wu\Documents\Tencent Files\\3200456059\FileRecv\产业链\产业链\\6-9产业链核算/2020-6至9月产业链工作量核算（金二）.xlsx')
-    # fd=test.get_sheet_by_name('金融二部')
+    # servers_api=openpyxl.open('C:\\Users\wu\Documents\Tencent Files\\3200456059\FileRecv\产业链\产业链\\6-9产业链核算/2020-6至9月产业链工作量核算（金二）.xlsx')
+    # fd=servers_api.get_sheet_by_name('金融二部')
     # gf=openpyxl.Workbook().active
 
     # print(fd['A1'])

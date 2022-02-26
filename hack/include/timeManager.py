@@ -59,7 +59,7 @@ def job4():
 import datetime
 if __name__=='__main__':
     timeManager = TimeManager()
-    timeManager.run('test',job,{
+    timeManager.run('servers_api',job,{
         'seconds': 3,
         # 'hours': 1,
         'type': 'interval'
@@ -88,5 +88,5 @@ if __name__=='__main__':
 #         'name':'fd',
 #         'g':'sd'
 #     }
-#     test(**obj)
+#     servers_api(**obj)
 #     print(t)

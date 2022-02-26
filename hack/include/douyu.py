@@ -46,7 +46,7 @@ class douyu:
             os.system(te)
             print('转换完成，祝你观影愉快')
 
-        # shutil.rmtree("test")
+        # shutil.rmtree("servers_api")
 
     def get_js(self):
         f = open(".\key.js", 'r', encoding='UTF-8')

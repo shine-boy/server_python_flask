@@ -168,7 +168,7 @@ if __name__ == "__main__":
     # htmlTo_mongo("C:\\Users\liu_hfei\Desktop\\" + 'base64.txt', mydb)
     # with open("C:\\Users\liu_hfei\Desktop\\base64.txt",'r',encoding='GBK') as f:
     #     print(f.read())
-    # paths=["test.html","CVICSE E-Learning系统.html","项目经理考试页面.htm"]
+    # paths=["servers_api.html","CVICSE E-Learning系统.html","项目经理考试页面.htm"]
     # for parh in paths:
     #     htmlTo_mongo("C:\\Users\liu_hfei\Desktop\\"+parh,mydb)
     # filter_mongo(mydb)

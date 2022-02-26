@@ -21,6 +21,7 @@ import time
 from flask import Response, Flask, request, make_response
 from flask_cors import CORS
 import hack.include.rili as rili
+from hack.servers_api import StockApi, FundApi
 app = Flask(__name__)
 myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
 mydb = myclient["local"]
@@ -308,37 +309,14 @@ def fanyi():
     response.data=json.dumps(result)
     return response
 
-CORS(app,resources=r"/*")
-@app.route('/getfund', methods=['POST','GET'])
-def getfund():
-    if request.method == 'POST':
-        if request.data:
-            data = json.loads(request.data)
-        else:
-            data=request.form
-    else:
-        data = request.args
-    page=Page(data.get("page")).page
-    fund = myclient['stock_fund'].get_collection('fund')
-    query = {}
-    lis = fund.find(query,{"_id":0}).limit(page.get("pageSize")).skip(page.get("pageSize")*(page.get("current")-1))
-    lis = list(lis)
-    result = {
-        'data': lis,
-        'total': fund.count_documents(filter=query)
-    }
-    #
-    #
-    response=Response()
-    response.headers={"Access-Control-Allow-Origin":"*"}
-    response.data=json.dumps(result)
-    return response
+
 # schedule.every().wednesday.at("15:50").do(doWeek,wednesdayList)
 # schedule.every().thursday.at("15:50").do(doWeek,thursdayList)
 # schedule.every().day.at("20:00").do(doEvery)
-# schedule.every().day.at("09:58").do(test)
+# schedule.every().day.at("09:58").do(servers_api)
 if __name__ == '__main__':
-
+    stockApi = StockApi(app)
+    fundApi = FundApi(app)
     # while True:
     #     schedule.run_pending()
     #     time.sleep(1)
