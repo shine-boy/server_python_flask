@@ -16,10 +16,14 @@ class Request:
             f = 'fd'
             CORS(self.app, resources=r"/*")
 
-            @self.app.route(url, methods=methods, endpoint=func.__name__)
+            @self.app.route( '/flask' + url, methods=methods, endpoint=func.__name__)
             def query():
-                data = self.get_date()
-                result = func(data)
+                try:
+                    data = self.get_date()
+                    result = func(data)
+                except Exception as e:
+                    result = str(e)
+                    pass
                 return self.set_response(result)
         return do
 
