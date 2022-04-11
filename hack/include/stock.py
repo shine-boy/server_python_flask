@@ -126,8 +126,11 @@ class Stock:
         # 不可太小，其他程序也会占用线程数
         self.threadingNum=maxthreading
 
-
-        myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+        mongo_ip = ['101.35.44.243', '127.0.0.1']
+        root = 'myUserAdmin'
+        password = 'abc123'
+        myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root,password,mongo_ip[1]))
+        # myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
         self.mydb = myclient["dongfangcaifu"]
         self.url="http://6.push2.eastmoney.com/api/qt/clist/get"
         self.menu=self.get_menu()

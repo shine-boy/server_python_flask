@@ -23,7 +23,11 @@ from flask_cors import CORS
 import hack.include.rili as rili
 from hack.servers_api import StockApi, FundApi
 app = Flask(__name__)
-myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+mongo_ip = ['101.35.44.243', '127.0.0.1']
+root = 'myUserAdmin'
+password = 'abc123'
+myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root,password,mongo_ip[1]))
+# myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
 mydb = myclient["local"]
 projectExam=myclient["projectExam"]
 sched = BackgroundScheduler()
