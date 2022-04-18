@@ -34,7 +34,8 @@ class demo(scrapy.Spider):
                              method='POST',body=json.dumps(self.post),errback=self.parse)
 
     def parse(self, response):
-
+        print(response.text)
+        return
         data=json.loads(response.text)
         pageCount=data["data"]["pageCount"]
         for da in data["data"]["data"]:
