@@ -22,7 +22,7 @@ from flask_cors import CORS
 import hack.include.rili as rili
 from hack.servers_api import StockApi, FundApi
 app = Flask(__name__)
-app.config['JSON_AS_ASCII'] = False 
+app.config['JSON_AS_ASCII'] = False
 app.config['JSONIFY_MIMETYPE'] = "application/json;charset=utf-8"
 myclient = mongodb_connect()
 mydb = myclient["local"]
@@ -95,7 +95,7 @@ def dongfangcaifu():
         sched.add_job(test, 'interval', minutes=2, end_date=times[i + 1], start_date=times[i],max_instances=10,misfire_grace_time=3600)
     # os.system("cd E:\git\/bigData && scrapy crawl dongfangcaifu")
 
-@sched.scheduled_job('cron',day_of_week="0-4",misfire_grace_time=3600)
+# @sched.scheduled_job('cron',day_of_week="0-4",misfire_grace_time=3600)
 def do_dongfangcaifu():
     dongfangcaifu()
 
