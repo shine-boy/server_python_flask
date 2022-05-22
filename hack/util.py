@@ -1,4 +1,4 @@
-
+# coding=utf-8
 import subprocess
 import pymongo
 import os
@@ -21,7 +21,7 @@ def getKeys_dic(obj,keys=[]):
         return None
     return result
 
-# É±ËÀ½ø³Ì
+# æ€æ­»è¿›ç¨‹
 def kill_port(port):
     resu = subprocess.Popen("lsof -i:" + port, shell=True, stdout=subprocess.PIPE)
     resu.wait()
@@ -31,7 +31,7 @@ def kill_port(port):
     print(result)
     result = str(result, encoding='gbk')
     lis = result.split('\n')
-    # É¾³ı ¿Õ°××Ö·û
+    # åˆ é™¤ ç©ºç™½å­—ç¬¦
     for i in range(len(lis)):
         lis[i] = lis[i].split(' ')
         removeNum = 0

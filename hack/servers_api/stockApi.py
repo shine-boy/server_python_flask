@@ -6,7 +6,6 @@ class StockApi(ServersApi):
 
     def __init__(self, app):
         ServersApi.__init__(self, app)
-        self.updateToday()
         # 根据股票编号查询对应股票数据
         @self.request.register('/getstock', methods=['POST', 'GET'])
         def getstock(data):
