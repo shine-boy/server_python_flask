@@ -7,6 +7,25 @@ def find(lis, target):
         return False
     return False
 
+def find_(lis, func):
+    try:
+        pass
+        for i in lis:
+            temp = func(i)
+            if temp:
+                return temp
+    except Exception as e:
+        return None
+
+def find_index(lis, func):
+    try:
+        pass
+        for i in range(len(lis)):
+            temp = func(lis[i])
+            if temp:
+                return i
+    except Exception as e:
+        return -1
 
 def findIndex(lis, target):
     index = -1

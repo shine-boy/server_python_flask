@@ -1,3 +1,4 @@
+# coding=utf-8
 from flask import Response, Flask, request
 from flask_cors import CORS
 import json
@@ -23,6 +24,7 @@ class Request:
                     result = func(data)
                 except Exception as e:
                     result = str(e)
+                    print(result)
                     pass
                 return self.set_response(result)
         return do
@@ -51,7 +53,8 @@ class ServersApi:
         mongo_ip = ['101.35.44.243', '127.0.0.1']
         root = 'myUserAdmin'
         password = 'abc123'
-        self.myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root,password,mongo_ip[0]))
+        # self.myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root,password,mongo_ip[1]))
+        self.myclient = pymongo.MongoClient("mongodb://{}:27017/".format( mongo_ip[1]))
         pass
 
 
