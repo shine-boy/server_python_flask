@@ -55,6 +55,18 @@ class StockApi(ServersApi):
             return result
 
         # 获取汇总表数据
+        @self.request.register('/updatestatistic', methods=['GET'])
+        def update_statistic(data):
+            limit = data.get('limit')
+            try:
+                self.updateToday(limit)
+                return True
+            except Exception as e:
+                print(e)
+                return False
+
+
+        # 获取汇总表数据
         @self.request.register('/stocklist', methods=['POST'])
         def stock_list(data):
             page = self.Page(data.get("page")).page
