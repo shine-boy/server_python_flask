@@ -59,7 +59,7 @@ class StockApi(ServersApi):
         def update_statistic(data):
             limit = data.get('limit')
             try:
-                self.updateToday(limit)
+                self.updateToday(int(limit))
                 return True
             except Exception as e:
                 print(e)

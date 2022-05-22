@@ -4,7 +4,7 @@ from flask_cors import CORS
 import json
 from hack.include import Page
 from hack.util import mongodb_connect
-
+import traceback
 class Request:
     def __init__(self, app: Flask):
         print('init')
@@ -23,6 +23,9 @@ class Request:
                     result = func(data)
                 except Exception as e:
                     result = str(e)
+
+                    # exc_type, exc_value, exc_traceback = sys.exc_info()
+                    # result = str(repr(traceback.format_exception(exc_type, exc_value, exc_traceback)))  # 将异常信息转为字符串
                     print(result)
                     pass
                 return self.set_response(result)
@@ -31,7 +34,7 @@ class Request:
     def set_response(self, result):
         response = Response()
         response.headers = {"Access-Control-Allow-Origin": "*"}
-        response.data = json.dumps(result)
+        response.data = json.dumps(result).encode('utf-8')
         return response
 
     def get_date(self):

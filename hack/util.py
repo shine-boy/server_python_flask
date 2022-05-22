@@ -50,6 +50,6 @@ def mongodb_connect():
     mongo_ip = ['101.35.44.243', '127.0.0.1']
     root = 'myUserAdmin'
     password = 'abc123'
-    myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[1]))
-    # myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+    # myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[1]))
+    myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     return myclient

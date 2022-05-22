@@ -22,6 +22,8 @@ from flask_cors import CORS
 import hack.include.rili as rili
 from hack.servers_api import StockApi, FundApi
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False 
+app.config['JSONIFY_MIMETYPE'] = "application/json;charset=utf-8"
 myclient = mongodb_connect()
 mydb = myclient["local"]
 projectExam=myclient["projectExam"]
