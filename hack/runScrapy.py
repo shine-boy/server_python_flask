@@ -7,8 +7,7 @@ import sys
 # path = os.path.abspath('./..')
 sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # 会追加到列表最尾部
 import hack.include.excel as myExcel
-from hack.util import isNull, kill_port
-import pymongo
+from hack.util import isNull, kill_port, mongodb_connect
 from hack.include.timeManager import TimeManager
 import threading
 from wsgiref.simple_server import make_server
@@ -23,11 +22,7 @@ from flask_cors import CORS
 import hack.include.rili as rili
 from hack.servers_api import StockApi, FundApi
 app = Flask(__name__)
-mongo_ip = ['101.35.44.243', '127.0.0.1']
-root = 'myUserAdmin'
-password = 'abc123'
-# myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root,password,mongo_ip[1]))
-myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+myclient = mongodb_connect()
 mydb = myclient["local"]
 projectExam=myclient["projectExam"]
 sched = BackgroundScheduler()

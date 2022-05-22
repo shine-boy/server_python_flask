@@ -3,8 +3,7 @@ from flask import Response, Flask, request
 from flask_cors import CORS
 import json
 from hack.include import Page
-import pymongo
-
+from hack.util import mongodb_connect
 
 class Request:
     def __init__(self, app: Flask):
@@ -50,11 +49,7 @@ class ServersApi:
     def __init__(self, app:Flask):
         self.request = Request(app)
         self.Page = Page
-        mongo_ip = ['101.35.44.243', '127.0.0.1']
-        root = 'myUserAdmin'
-        password = 'abc123'
-        # self.myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root,password,mongo_ip[1]))
-        self.myclient = pymongo.MongoClient("mongodb://{}:27017/".format( mongo_ip[1]))
+        self.myclient = mongodb_connect()
         pass
 
 

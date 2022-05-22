@@ -1,15 +1,15 @@
 # coding: utf-8
 # 东方财富基金
 import scrapy
-import pymongo
 import time
 from urllib import parse
+from hack.util import mongodb_connect
 import demjson
 class fund(scrapy.Spider):
     name = 'dfcf_fund'
 
     def __init__(self):
-        myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+        myclient = mongodb_connect
         db = myclient["stock_fund"]
         self.mydb = db['fund']
         self.url = 'http://fund.eastmoney.com/Data/Fund_JJJZ_Data.aspx'

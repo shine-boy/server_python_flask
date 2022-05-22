@@ -3,15 +3,15 @@ import time
 from urllib import parse
 import json
 import math
-import pymongo
 import requests
+from hack.util import mongodb_connect
 import hack.include.stock as stock
 from datetime import datetime
 class dongfang(scrapy.Spider):
     name='dongfangcaifu'
 
     def __init__(self):
-        myclient = pymongo.MongoClient("mongodb://192.168.142.1:27017/")
+        myclient = mongodb_connect()
         self.mydb = myclient["dongfangcaifu"]
         pass
 

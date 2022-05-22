@@ -1,5 +1,6 @@
 
 import subprocess
+import pymongo
 import os
 # "%Y-%m-%d %H:%M:%S"
 def isNull(obj):
@@ -43,3 +44,12 @@ def kill_port(port):
     pid_index = lis[0].index('PID')
     resu = subprocess.Popen('kill -9 ' + lis[1][pid_index], shell=True, stdout=subprocess.PIPE)
     resu.wait()
+
+
+def mongodb_connect():
+    mongo_ip = ['101.35.44.243', '127.0.0.1']
+    root = 'myUserAdmin'
+    password = 'abc123'
+    myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[1]))
+    # myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+    return myclient
