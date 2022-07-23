@@ -54,7 +54,7 @@ class StockApi(ServersApi):
             }
             return result
 
-        # 获取汇总表数据
+        # 更新汇总表数据
         @self.register('/updatestatistic', methods=['GET'])
         def update_statistic(data):
             limit = data.get('limit')
