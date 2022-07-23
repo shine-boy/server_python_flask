@@ -7,7 +7,7 @@ class FundApi(ServersApi):
     def __init__(self, app):
         ServersApi.__init__(self, app)
 
-        @self.request.register('/getfund', methods=['POST', 'GET'])
+        @self.register('/getfund', methods=['POST', 'GET'])
         def getfund(data):
             page = self.Page(data.get("page")).page
             fund = self.myclient['stock_fund'].get_collection('fund')

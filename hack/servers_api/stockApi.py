@@ -7,7 +7,7 @@ class StockApi(ServersApi):
     def __init__(self, app):
         ServersApi.__init__(self, app)
         # 根据股票编号查询对应股票数据
-        @self.request.register('/getstock', methods=['POST', 'GET'])
+        @self.register('/getstock', methods=['POST', 'GET'])
         def getstock(data):
             if data.get('code'):
                 code = data.get('code')
@@ -36,7 +36,7 @@ class StockApi(ServersApi):
                 return '未查询到数据'
 
         # 获取股票名称列表
-        @self.request.register('/getnames', methods=['POST', 'GET'])
+        @self.register('/getnames', methods=['POST', 'GET'])
         def getnames(data):
             fund = self.myclient['dongfangcaifu'].get_collection('names')
             page = self.Page(data.get("page")).page
@@ -55,7 +55,7 @@ class StockApi(ServersApi):
             return result
 
         # 获取汇总表数据
-        @self.request.register('/updatestatistic', methods=['GET'])
+        @self.register('/updatestatistic', methods=['GET'])
         def update_statistic(data):
             limit = data.get('limit')
             try:
@@ -67,7 +67,7 @@ class StockApi(ServersApi):
 
 
         # 获取汇总表数据
-        @self.request.register('/stocklist', methods=['POST'])
+        @self.register('/stocklist', methods=['POST'])
         def stock_list(data):
             page = self.Page(data.get("page")).page
             query = {}
