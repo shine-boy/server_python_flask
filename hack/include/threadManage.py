@@ -47,12 +47,12 @@ class ThreadManage:
                     if activeCount <= self.threadingNum:
                         temp.start()
                     else:
-                        self.threads.append(temp)
+                        self.threads.append(obj)
                         time.sleep(1)
-                        print("可活动线程数：%d" % self.threadingNum)
-                        print("活动线程数：%d" % activeCount)
+                        # print("可活动线程数：%d" % self.threadingNum)
+                        # print("活动线程数：%d" % activeCount)
                 except Exception as e:
-                    print(e)
+                    print('threadManage',e)
                     time.sleep(1)
                     break
 
@@ -72,10 +72,11 @@ if __name__ == '__main__':
         print('hh', i)
     now = datetime.now()
     print(datetime.fromtimestamp(now.timestamp() + 20), now)
-    for i in range(1):
+    for i in range(4):
         print(i)
         stock.add(te, (i,),timeout=10)
     stock.run()
+    stock.waiter()
     print('start')
     # stock.waiter()
 

@@ -4,10 +4,12 @@ import datetime
 from hack.include.list import findIndex, find_index
 from hack.util import isNull
 import hack.include.rili as rili
+from hack.include.threadManage import ThreadManage
 class StockApi(ServersApi):
 
     def __init__(self, app):
         ServersApi.__init__(self, app)
+        self.threadManage = ThreadManage(1000)
         # 根据股票编号查询对应股票数据
         @self.register('/getstock', methods=['POST', 'GET'])
         def getstock(data):
@@ -59,9 +61,10 @@ class StockApi(ServersApi):
         @self.register('/updatestatistic', methods=['GET'])
         def update_statistic(data):
             limit = data.get('limit')
+            now = datetime.datetime.now()
             try:
                 self.updateToday(int(limit))
-                return True
+                return 'time:' + str(datetime.datetime.now() - now)
             except Exception as e:
                 print(e,limit)
                 return False
@@ -97,8 +100,7 @@ class StockApi(ServersApi):
         shorts = shortDB.find()
         shorts = list(shorts)
         sort = [("time", -1)]
-        for i in range(len(shorts)):
-
+        def get_stock_short(i):
             current_time = shorts[i].get('time')
             next_time = datetime.datetime(year=current_time.year, month=current_time.month, day=current_time.day + 1)
             names = shorts[i].get('short') or []
@@ -119,6 +121,8 @@ class StockApi(ServersApi):
             shortDB.remove(shorts[i].get('_id'))
             shorts[i]['short'] = names
             shortDB.insert_one(shorts[i])
+        for i in range(len(shorts)):
+            self.threadManage.add(get_stock_short, (i,))
 
 
     # 更新股票汇总表
@@ -129,8 +133,40 @@ class StockApi(ServersApi):
         totalDB = self.myclient['stock_statistic']['totalDB']
         # 本次更新未汇入的表信息，执行次方法时可能有部分数据欠缺
         shortDB = self.myclient['stock_statistic']['shortDB']
+
+        # 获取需要更新的日期
+        def updateDays(limit_day):
+            days = []
+            now = datetime.datetime.now()
+            shortDB = self.myclient['stock_statistic']['shortDB']
+            shorts = shortDB.find().sort(sort)
+            shorts = list(shorts)
+            i = 0
+            while i < limit_day:
+
+                cur = datetime.datetime(year=now.year, month=now.month, day=now.day - i)
+                if rili.isStockDeal(cur) is False:
+                    limit_day += 1
+                    i += 1
+                    continue
+
+                temp_time = datetime.datetime(year=cur.year, month=cur.month, day=cur.day + 1)
+                print(cur, temp_time)
+                exit = False
+                for short in shorts:
+                    short_time = short.get('time')
+                    print(short_time)
+                    if short_time >= cur and short_time < temp_time:
+                        exit = True
+                        break
+                if exit is False:
+                    days.append(cur)
+                i += 1
+            return days, limit_day
+
+        days, limit_day = updateDays(limit)
         # 0点
-        temp_time = datetime.datetime(year=now.year, month=now.month, day=now.day - limit + 1)
+        temp_time = datetime.datetime(year=now.year, month=now.month, day=now.day - limit_day + 1)
         # 删除超过需要汇总时间的数据
         shortDB.delete_many({
             "time": {"$lt": temp_time}
@@ -150,36 +186,9 @@ class StockApi(ServersApi):
         if len(shorts) == limit:
             return
 
-        # 获取需要更新的日期
-        def updateDays(limit_day):
-            days = []
-            now = datetime.datetime.now()
-            shortDB = self.myclient['stock_statistic']['shortDB']
-            shorts = shortDB.find().sort(sort)
-            shorts = list(shorts)
-            i = 0
-            while i<limit_day:
-
-                cur = datetime.datetime(year=now.year, month=now.month, day=now.day - i)
-                if rili.isStockDeal(cur) is False:
-                    limit_day+=1
-                    i+=1
-                    continue
-
-                temp_time = datetime.datetime(year=cur.year, month=cur.month, day=cur.day + 1)
-                exit = False
-                for short in shorts:
-                    short_time = short.get('time')
-                    if short_time > cur and short_time < temp_time:
-                        exit = True
-                        break
-                if exit is False:
-                    days.append(cur)
-                i+=1
-            return days
-
         # 汇总
         def summary(days):
+            print(days)
             sort = [("time", -1)]
             short_data = []
             for current_time in days:
@@ -189,9 +198,9 @@ class StockApi(ServersApi):
                 })
 
             stocks = self.myclient['dongfangcaifu'].collection_names()
-            for stock in stocks:
+            def get_stock_limit(stock) :
                 if findIndex([ 'names'],stock) > -1:
-                    continue
+                    return
                 stockDB = self.myclient['dongfangcaifu'].get_collection(stock)
                 for i in range(len(days)):
                     current_time = days[i]
@@ -208,6 +217,10 @@ class StockApi(ServersApi):
                     else:
                         if totalDB.find_one({'time': data.get('time')}) is None:
                             totalDB.insert_one(data)
+            for stock in stocks:
+                self.threadManage.add(get_stock_limit, (stock,))
+            self.threadManage.run()
+            self.threadManage.waiter()
             pass
         #     汇总完成，更新欠缺表
             for short in short_data:
@@ -216,7 +229,7 @@ class StockApi(ServersApi):
                 else:
                     shortDB.delete_one({"_id": short.get('_id')})
                 shortDB.insert_one(short)
-        summary(updateDays(limit))
+        summary(days)
 
 if __name__ == '__main__':
     now = datetime.datetime.now()
