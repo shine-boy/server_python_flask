@@ -1,4 +1,4 @@
-
+from hack.include.list import findIndex
 
 class Page:
     def __init__(self,page=None):
@@ -16,3 +16,25 @@ class Page:
             # page["current"] = int(page.get("current"))
         self.page=page
 
+
+class Sort:
+    def __init__(self, sort=None):
+        if sort is None:
+            sort = [("time", -1)]
+        else:
+            sortKey = sort.get('sort') or 'time'
+            order = sort.get('order') or -1
+            ascend = ['ascend', 1]
+            # descend = ['descend', -1]
+            if findIndex(ascend, order) > -1:
+                order = 1
+            else:
+                order = -1
+            sort = [(sortKey, order)]
+        self.sort = sort
+
+
+if __name__ == '__main__':
+    f = {"name": 1}
+    g = f.get('names') or 'time'
+    print([1].index(2))

@@ -2,7 +2,7 @@
 from flask import Response, Flask, request
 from flask_cors import CORS
 import json
-from hack.include import Page
+from hack.include import Page, Sort
 from hack.util import mongodb_connect
 import traceback
 class Request:
@@ -56,7 +56,7 @@ class ServersApi(Request):
         Request.__init__(self, app)
         self.Page = Page
         self.myclient = mongodb_connect()
-
+        self.Sort = Sort
         pass
 
     def re_connect(self):

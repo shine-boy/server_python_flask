@@ -1,7 +1,8 @@
 # coding=utf-8
 from hack.servers_api.serverApi import ServersApi
 import datetime
-from hack.include.list import findIndex
+from hack.include.list import findIndex, find_index
+from hack.util import isNull
 class StockApi(ServersApi):
 
     def __init__(self, app):
@@ -13,12 +14,11 @@ class StockApi(ServersApi):
                 code = data.get('code')
                 fund = self.myclient['dongfangcaifu'].get_collection(code)
                 page = self.Page(data.get("page")).page
+                sort = self.Sort({
+                    'sort': data.get('sort'),
+                    'order': data.get('order')
+                }).sort
                 query = {}
-                sortType = data.get("sort")
-                if sortType is None:
-                    sort = [("time", -1)]
-                else:
-                    sort = [(sortType, -1)]
                 lis = fund.find(query).sort(sort).limit(page.get("pageSize")).skip(
                     page.get("pageSize") * (page.get("current") - 1))
                 lis = list(lis)
@@ -62,7 +62,7 @@ class StockApi(ServersApi):
                 self.updateToday(int(limit))
                 return True
             except Exception as e:
-                print(e)
+                print(e,limit)
                 return False
 
 
@@ -70,12 +70,13 @@ class StockApi(ServersApi):
         @self.register('/stocklist', methods=['POST'])
         def stock_list(data):
             page = self.Page(data.get("page")).page
+            sort = self.Sort({
+                'sort': data.get('sort'),
+                'order': data.get('order')
+            }).sort
             query = {}
-            sortType = data.get("sort")
-            if sortType is None:
-                sort = [("time", -1)]
-            else:
-                sort = [(sortType, -1)]
+            if isNull(data.get("search")) is False:
+                query['$or'] = [{ "f57": {'$regex': ".*" + data.get("search") + ".*"}}, { "f58": {'$regex': ".*" + data.get("search") + ".*"}}]
             totalDB = self.myclient['stock_statistic']['totalDB']
             lis = totalDB.find(query).sort(sort).limit(page.get("pageSize")).skip(
                 page.get("pageSize") * (page.get("current") - 1))
@@ -94,6 +95,7 @@ class StockApi(ServersApi):
         shortDB = self.myclient['stock_statistic']['shortDB']
         shorts = shortDB.find()
         shorts = list(shorts)
+        sort = [("time", -1)]
         for i in range(len(shorts)):
 
             current_time = shorts[i].get('time')
@@ -103,7 +105,12 @@ class StockApi(ServersApi):
             totalDB = self.myclient['stock_statistic']['totalDB']
             for name in names:
                 stockDB = self.myclient['dongfangcaifu'].get_collection(name)
-                data = stockDB.find_one({"time": {"$gte": current_time, "$lt": next_time}})
+                data = stockDB.find({"time": {"$gte": current_time, "$lt": next_time}}).sort(sort).limit(1)
+                data = list(data)
+                if len(data) > 0:
+                    data = data[0]
+                else:
+                    continue
                 if data is not None:
                     totalDB.insert_one(data)
                     names.remove(name)
@@ -121,70 +128,74 @@ class StockApi(ServersApi):
         totalDB = self.myclient['stock_statistic']['totalDB']
         # 本次更新未汇入的表信息，执行次方法时可能有部分数据欠缺
         shortDB = self.myclient['stock_statistic']['shortDB']
-        shorts = shortDB.find().sort(sort)
-        shorts = list(shorts)
         # 0点
         temp_time = datetime.datetime(year=now.year, month=now.month, day=now.day - limit + 1)
-        flag = False
-        for index in range(len(shorts)):
-            if temp_time > shorts[index].get('time'):
-                shortDB.delete_one(shorts[index])
-                # 表明有数据过期，需对应删除汇总表数据
-                flag = True
-        if flag:
-            # 表明有数据过期，需对应删除汇总表数据
-            totalDB.delete_many({
-                "time": {"$lt": temp_time}
-            })
+        # 删除超过需要汇总时间的数据
+        shortDB.delete_many({
+            "time": {"$lt": temp_time}
+        })
+        # 表明有数据过期，需对应删除汇总表数据
+        totalDB.delete_many({
+            "time": {"$lt": temp_time}
+        })
+
         # 计算哪些天的数据需要新汇总
         shorts = shortDB.find().sort(sort)
         shorts = list(shorts)
+
+        # 执行欠缺表中对应数据的汇总
+        self.do_short()
         # 相等的话表明今天已经汇总过
         if len(shorts) == limit:
-            # 执行欠缺表中对应数据的汇总
-            self.do_short()
-            pass
             return
 
-        # 实际需要的新增汇总天数
-        limit = limit-len(shorts)
+        # 获取需要更新的日期
+        def updateDays(limit):
+            days = []
+            now = datetime.datetime.now()
+            shortDB = self.myclient['stock_statistic']['shortDB']
+            shorts = shortDB.find().sort(sort)
+            shorts = list(shorts)
+            i = 0
+            while i<limit:
+                cur = datetime.datetime(year=now.year, month=now.month, day=now.day - i)
+                temp_time = datetime.datetime(year=cur.year, month=cur.month, day=cur.day + 1)
+                exit = False
+                for short in shorts:
+                    short_time = short.get('time')
+                    if short_time > cur and short_time < temp_time:
+                        exit = True
+                        break
+                if exit is False:
+                    days.append(cur)
+                i+=1
+            return days
 
-        # 得到缺失信息
-        def get_short(i):
-            current_time = datetime.datetime(year=now.year, month=now.month, day=now.day - i)
-            next_time = datetime.datetime(year=now.year, month=now.month, day=now.day - i + 1)
-            temp = shortDB.find_one({"time": {"$gte": current_time, "$lt": next_time}})
-            if temp is None:
-                temp = {
+        # 汇总
+        def summary(days):
+            sort = [("time", -1)]
+            short_data = []
+            for current_time in days:
+                short_data.append({
                     "time": current_time,
                     "short": []
-                }
-            else:
-                # TODO
-                #  最后才应该删除
-                # shortDB.delete_one(temp)
-                pass
-            return temp
-        # 汇总
-        def summary(lim):
-            short_data = []
-            for i in range(lim):
-                short_data.append(get_short(i))
+                })
 
             stocks = self.myclient['dongfangcaifu'].collection_names()
             for stock in stocks:
                 if findIndex([ 'names'],stock) > -1:
                     continue
                 stockDB = self.myclient['dongfangcaifu'].get_collection(stock)
-                datas = stockDB.find().sort(sort).limit(lim)
-                datas = list(datas)
-                if len(datas) == 0:
-                    pass
+                for i in range(len(days)):
+                    current_time = days[i]
 
-                for i in range(lim):
-                    current_time = datetime.datetime(year=now.year, month=now.month, day=now.day - i)
-                    next_time = datetime.datetime(year=now.year, month=now.month, day=now.day - i + 1)
-                    data = stockDB.find_one({"time": {"$gte": current_time, "$lt": next_time}})
+                    next_time = datetime.datetime(year=current_time.year, month=current_time.month, day=current_time.day + 1)
+                    data = stockDB.find({"time": {"$gte": current_time, "$lt": next_time}}).sort(sort).limit(1)
+                    data= list(data)
+                    if len(data) > 0:
+                        data = data[0]
+                    else:
+                        data = None
                     if data is None:
                         short_data[i].get('short').append(stock)
                     else:
@@ -198,5 +209,9 @@ class StockApi(ServersApi):
                 else:
                     shortDB.delete_one({"_id": short.get('_id')})
                 shortDB.insert_one(short)
-        summary(limit)
+        summary(updateDays(limit))
 
+if __name__ == '__main__':
+    now = datetime.datetime.now()
+    cur = datetime.datetime(year=now.year, month=now.month, day=now.day - 1)
+    print([][0])
