@@ -3,6 +3,7 @@ from hack.servers_api.serverApi import ServersApi
 import datetime
 from hack.include.list import findIndex, find_index
 from hack.util import isNull
+import hack.include.rili as rili
 class StockApi(ServersApi):
 
     def __init__(self, app):
@@ -150,15 +151,21 @@ class StockApi(ServersApi):
             return
 
         # 获取需要更新的日期
-        def updateDays(limit):
+        def updateDays(limit_day):
             days = []
             now = datetime.datetime.now()
             shortDB = self.myclient['stock_statistic']['shortDB']
             shorts = shortDB.find().sort(sort)
             shorts = list(shorts)
             i = 0
-            while i<limit:
+            while i<limit_day:
+
                 cur = datetime.datetime(year=now.year, month=now.month, day=now.day - i)
+                if rili.isStockDeal(cur) is False:
+                    limit_day+=1
+                    i+=1
+                    continue
+
                 temp_time = datetime.datetime(year=cur.year, month=cur.month, day=cur.day + 1)
                 exit = False
                 for short in shorts:

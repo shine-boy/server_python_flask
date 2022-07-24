@@ -7,8 +7,7 @@ from urllib import parse
 import threading
 import pymongo
 from hack.include import list as m_list
-import os
-# import hack.include as m_list
+from hack.include.threadManage import ThreadManage
 import hack.util as util
 ts.set_token('7c797390e1c7caa6f79aadc01e4ad3577707f240c052f9b682f6782f')
 def get_realtime_quotes(code):
@@ -122,9 +121,9 @@ class Stock:
         "f170": "涨幅",
     }
 
-    def __init__(self,maxthreading=1000):
-        # 不可太小，其他程序也会占用线程数
-        self.threadingNum=maxthreading
+    def __init__(self):
+        self.threadManage = ThreadManage(1000)
+
         myclient = util.mongodb_connect()
         self.mydb = myclient["dongfangcaifu"]
         self.url="http://6.push2.eastmoney.com/api/qt/clist/get"
@@ -148,17 +147,10 @@ class Stock:
             'Referer':'http://quote.eastmoney.com/',
             "User-Agent":'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36'
         }
-        self.threads=[]
         self.stocks=[]
         self.get_stocks()
-        # 等待线程执行结束
-        self.waiter()
-        # self.threadingNum += threading.activeCount()
 
-    def __del__(self):
-        for i in self.threads:
-            pass;
-        self.threads.clear()
+
     def get_menu(self):
         url='http://quote.eastmoney.com/center/api/sidemenu.json'
         res=requests.get(url=url)
@@ -194,11 +186,8 @@ class Stock:
         menus=self.find(["沪深京板块",'概念板块'])
         for menu in menus:
             self.run(get,menu,1)
-
-    def waiter(self):
-        for i in self.threads:
-            i.join()
-        self.threads.clear()
+        self.threadManage.run()
+        self.threadManage.waiter()
 
     def find(self,title,menu=None):
         if menu is None:
@@ -233,21 +222,13 @@ class Stock:
             colloction.insert_one(doc)
 
     def run(self,fun,*args):
-        temp = threading.Thread(target=fun, args=args)
-        temp.start()
-        self.threads.append(temp)
-        while True:
-            activeCount = threading.activeCount()
-            if activeCount< self.threadingNum:
-                break
-            time.sleep(1)
-            print("可活动线程数：%d"%self.threadingNum)
-            print("活动线程数：%d"%activeCount)
+        self.threadManage.add(fun, args)
 
     def do(self,insert=None):
-        for stock in self.stocks:
-            if insert is not None:
+        if insert is not None:
+            for stock in self.stocks:
                 self.run(insert, stock)
+            self.threadManage.run()
 
 
     # 行情
