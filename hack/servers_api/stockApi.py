@@ -278,6 +278,7 @@ class Statistic :
                     "maxDiff": 0,
                     "min": 10000,
                     "max": 0,
+                    #  连续下降数
                     'num': 0,
                     "code": code,
                     'name': name.get('name'),
