@@ -17,6 +17,7 @@ install:
   stage: install
   script:
     - sudo -i & cd /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/ & pipenv install --skip-lock
+  allow_failure: true
 
 
 #build-job:
