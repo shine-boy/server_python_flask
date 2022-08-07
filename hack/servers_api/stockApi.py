@@ -94,6 +94,14 @@ class StockApi(ServersApi):
             }
             return result
 
+        # 最近连续下降次数最多的10个
+        @self.register('/stock_stastic', methods=['POST'])
+        def stock_stastic(data):
+            stastic = Statistic(self.myclient)
+            limit = data.get('limit') or 10
+            day_limit = data.get('days') or 7
+            return stastic.near_day(limit, day_limit, ['f43', 'f170'])
+
     # 执行欠缺表里欠缺的数据，更新到汇总表
     def do_short(self):
         shortDB = self.myclient['stock_statistic']['shortDB']
@@ -231,7 +239,105 @@ class StockApi(ServersApi):
                 shortDB.insert_one(short)
         summary(days)
 
+from hack.util import mongodb_connect
+class Statistic :
+    def __init__(self, mongoClient=None):
+        self.mongoClient = mongoClient or mongodb_connect()
+        self.threadManage = ThreadManage(1000)
+        self.statisticdb = self.mongoClient['stock_statistic']
+
+
+    def n_diff(self, code, n=5, attribute="f57"):
+        try:
+            db = self.mongoClient['dongfangcaifu'].get_collection(code)
+
+        except Exception as e:
+            return e
+    # 获取所有股票名称
+    def getNames(self):
+        fund = self.mongoClient['dongfangcaifu'].get_collection('names')
+        return list(fund.find())
+
+    # 最近连续下降次数最多的10个
+    def near_day(self, limit=10, day_limit=10, attributes=["f43"]):
+        results ={}
+        for attribute in attributes:
+            results[attribute] = []
+        names = self.getNames()
+        db = self.mongoClient['dongfangcaifu']
+        sort = [("time", -1)]
+        days = rili.stock_days(day_limit)
+
+        for name in names:
+            def computeDetail(name):
+                code = name.get('code')
+                next = None
+                details = {}
+                for attribute in attributes:
+                    details[attribute] = {
+                    "maxDiff": 0,
+                    "min": 10000,
+                    "max": 0,
+                    'num': 0,
+                    "code": code,
+                    'name': name.get('name'),
+                    'type': ''
+                }
+                for cur in days:
+                    try:
+                        next_time = rili.next_n_day(cur)
+                        data = db[code].find({"time": {"$gte": cur, "$lt": next_time}}).sort(sort).limit(1)
+                        data = list(data)
+                        if len(data) > 0:
+                            data = data.pop()
+                        else:
+                            continue
+                        for attribute in attributes:
+                            detail = details[attribute]
+                            detail['min'] = min(detail['min'], data.get(attribute))
+                            detail['max'] = max(detail['max'], data.get(attribute))
+                            if next is not None:
+                                if next.get(attribute) < data.get(attribute):
+                                    detail['num'] += 1
+                        next = data
+                    except Exception as e:
+                        print(e, data)
+                        continue
+                for attribute in attributes:
+                    result = results[attribute]
+                    detail = details[attribute]
+                    detail['maxDiff'] = detail['max'] - detail['min']
+                    if detail['max'] != 0:
+                        detail['type'] = next.get('f127')
+                        result.append(detail)
+            self.threadManage.add(computeDetail, (name,))
+        self.threadManage.run()
+        self.threadManage.waiter()
+
+        def sortfunc(data):
+            return data.get('maxDiff')
+
+        for attribute in attributes:
+            result = results[attribute]
+            result.sort(key=sortfunc, reverse=True)
+            result = result[:limit]
+        return results
+
+    def calculate(self):
+        db = self.statisticdb['calculate']
+        names = self.getNames()
+        for name in names:
+            def calcu():
+                data = {
+                    "factor": ['f43', 'f135', 'f136', 'f137', 'f138', 'f139', 'f141', 'f142', 'f144']
+                }
+                pass
+
+
+
 if __name__ == '__main__':
     now = datetime.datetime.now()
     cur = datetime.datetime(year=now.year, month=now.month, day=now.day - 1)
-    print([][0])
+    da = Statistic()
+    print('价值', '涨幅')
+    print(da.near_day(10,30, ['f43', 'f170']))

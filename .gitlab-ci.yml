@@ -6,17 +6,17 @@ cache: &global_cache
     - node_modules
 
 stages: # 分段
-#  - install
+  - install
   # - eslint
 #  - build
   - start
 
-#install:
-#  tags:
-#    - sss
-#  stage: install
-#  script:
-#    - sudo pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/
+install:
+  tags:
+    - sss
+  stage: install
+  script:
+    - sudo pipenv install
 
 
 #build-job:

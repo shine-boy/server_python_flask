@@ -12,15 +12,22 @@ class ThreadManage:
         self.threadingNum=maxthreading
         self.threads=[]
         self.active = False
-
+        self.running = []
     def __del__(self):
         for i in self.threads:
             pass;
         self.threads.clear()
 
     def waiter(self):
-        while len(self.threads) >0:
-            time.sleep(1)
+        try:
+            while len(self.running) > 0:
+                temp = self.running.pop()
+                if temp.is_alive():
+                    self.running.append(temp)
+                    time.sleep(1)
+
+        except Exception as e:
+            print('end'+ e)
 
     def add(self,fun, args=(),*, timeout=120, endtime=None):
         temp = threading.Thread(target=fun, args=args)
@@ -46,6 +53,7 @@ class ThreadManage:
                     activeCount = threading.activeCount()
                     if activeCount <= self.threadingNum:
                         temp.start()
+                        self.running.append(temp)
                     else:
                         self.threads.append(obj)
                         time.sleep(1)
