@@ -16,7 +16,7 @@ install:
     - sss
   stage: install
   script:
-    - sudo pipenv install
+    - sudo pipenv install --skip-lock
 
 
 #build-job:
