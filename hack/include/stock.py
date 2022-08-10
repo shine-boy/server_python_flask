@@ -208,6 +208,9 @@ class Stock:
                 break
         return result
 
+    def waiter(self):
+        self.threadManage.waiter()
+        
     def insert_mongo(self,code):
         current = datetime.now()
         doc=self.marketAnalysis(code,current)
