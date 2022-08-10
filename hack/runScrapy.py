@@ -321,6 +321,7 @@ if __name__ == '__main__':
     # while True:
     #     schedule.run_pending()
     #     time.sleep(1)
+    do_dongfangcaifu()
     kill_port('5000')
     time.sleep(3);
     threading.Thread(target=doSched).start()
