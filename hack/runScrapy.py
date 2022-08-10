@@ -5,7 +5,8 @@ import sys
 
 # linux下包导入失败
 # path = os.path.abspath('./..')
-sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # 会追加到列表最尾部
+# sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # 会追加到列表最尾部
+sys.path.append(os.getcwd())  # 会追加到列表最尾部
 import hack.include.excel as myExcel
 from hack.util import isNull, kill_port, mongodb_connect
 from hack.include.timeManager import TimeManager
@@ -326,4 +327,5 @@ if __name__ == '__main__':
     threading.Thread(target=doSched).start()
     server = make_server('0.0.0.0', 5000, app)
     server.serve_forever()
+    print('run: 0.0.0.0:5000')
     # pass

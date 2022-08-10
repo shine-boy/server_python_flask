@@ -5,7 +5,6 @@ import time
 from datetime import datetime
 from urllib import parse
 import threading
-import pymongo
 from hack.include import list as m_list
 from hack.include.threadManage import ThreadManage
 import hack.util as util
@@ -221,13 +220,13 @@ class Stock:
             if names.find_one({'code': doc['f57']}) is None:
                 names.insert_one({'code': doc['f57'], 'name': doc['f58']})
             colloction=self.mydb[doc['f57']]
-
             colloction.insert_one(doc)
 
     def run(self,fun,*args):
         self.threadManage.add(fun, args)
 
     def do(self,insert=None):
+        print('start do stock')
         if insert is not None:
             for stock in self.stocks:
                 self.run(insert, stock)
@@ -252,7 +251,6 @@ class Stock:
         param['cb'] = 'jQuery112407522976605656146_' + str(int(current.timestamp()))
         url+="?"+parse.urlencode(param)
         res=requests.get(url=url,headers=self.headers)
-        print(res.text)
         if res.status_code == 200:
             data = json.loads(res.text[res.text.find("{"):-2])
             return data.get('data')

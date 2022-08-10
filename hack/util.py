@@ -1,6 +1,7 @@
 # coding=utf-8
 import subprocess
 import pymongo
+import sys
 import os
 # "%Y-%m-%d %H:%M:%S"
 def isNull(obj):
@@ -47,9 +48,19 @@ def kill_port(port):
 
 
 def mongodb_connect():
+
     mongo_ip = ['101.35.44.243', '127.0.0.1']
     root = 'myUserAdmin'
     password = 'abc123'
-    myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[0]))
-    # myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+    try:
+        env_ = sys.argv[1]
+        if env_ == 'SERVER':
+            myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[1]))
+        else:
+            myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+    except Exception as e:
+        myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     return myclient
+
+if __name__ == '__main__':
+    print(sys.argv)

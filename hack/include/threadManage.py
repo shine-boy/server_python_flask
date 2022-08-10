@@ -66,7 +66,7 @@ class ThreadManage:
 
         temp = threading.Thread(target=do)
         temp.run()
-        self.active = True
+        self.active = False
 
 
 

@@ -33,7 +33,6 @@ class StockApi(ServersApi):
                     'data': lis,
                     'total': fund.count_documents(filter=query)
                 }
-                print(result)
                 return result
             else:
                 return '未查询到数据'
