@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import os
+from hack.util import mongodb_connect
 import sys
 import pymongo
 import io
@@ -170,19 +171,55 @@ def plot_history(history):
     plt.legend()
     plt.show()
 
+class Stock_data:
+    def __init__(self, code, startDate=None):
+        myMongo = mongodb_connect()
+        self.mydb = myMongo['dongfangcaifu'][code]
+        self.startDate = startDate
+        self.data = []
+        self.get_data()
 
+    def get_data(self):
+        keys = ['time', 'f11', 'f12', 'f13', 'f15', 'f17', 'f19', 'f31', 'f33', 'f35', 'f37', 'f39', 'f43', 'f44', 'f45',
+               'f46', 'f47', 'f48', 'f49', 'f50','f52', 'f60', 'f71', 'f135', 'f136', 'f137', 'f138', 'f139', 'f141', 'f142', 'f144', 'f145',
+               'f147', 'f148', 'f161', 'f168', 'f169', 'f170']
+        query = {}
+        if self.startDate:
+            query['time'] = {"$gte": self.startDate}
+        sort = [("time", -1)]
+        projection = {
+            '_id': 0
+        }
+        for key in keys:
+            projection[key] = 1
+        result = self.mydb.find(query, projection).sort(sort)
+        result = list(result)
+        startYear = datetime(year=2020, month=1, day=1)
+        def should_remove(item):
+            for i in item:
+                print(type(item[i]))
+                if type(item[i]) is not int and type(item[i]) is not float:
+                    return True
+            return False
+        for res in result:
+            res['time'] = (res['time'].timestamp() - startYear.timestamp()) * 1000
+            # 当天交易时间9：30 = 0， 15：00 = 5.5*60*60, 减8是因为时间格式
+            res['c_time'] = res['time'] % (24 * 60 * 60 * 1000) - (9.5 - 8) * 60 * 60 * 1000
+            if should_remove(res) is False:
+                self.data.append(res)
 
-if __name__ == '__main__':
-    raw_dataset = pd.read_csv('../data/stock.csv',  low_memory=False,
-                              na_values="?", comment='\t',index_col=[0],
+# 以前的main方法
+def pre_main():
+    raw_dataset = pd.read_csv('../data/stock.csv', low_memory=False,
+                              na_values="?", comment='\t', index_col=[0],
                               skipinitialspace=True)
     dataset = raw_dataset.copy()
     dataset.pop('time')
     print(dataset.size)
     # dataset.replace(str('-'),np.nan)
     # dataset.dropna()
-    dataset=dataset[~dataset.isin([str('-'),'-',np.NaN])]
-    dataset=dataset.dropna()
+    dataset = dataset[~dataset.isin([str('-'), '-', np.NaN])]
+    dataset = dataset.dropna()
     print(dataset.size)
     # dataset.pop("f58")
     # to_one('f127', dataset)
@@ -197,13 +234,14 @@ if __name__ == '__main__':
     train_labels = train_dataset.pop('next2')
     test_labels = test_dataset.pop('next2')
 
-    train_dataset = train_dataset.astype('float64',errors='ignore')
-    test_dataset=test_dataset.astype('float64',errors='ignore')
+    train_dataset = train_dataset.astype('float64', errors='ignore')
+    test_dataset = test_dataset.astype('float64', errors='ignore')
     train_stats = train_dataset.describe()
     # 转置
     train_stats = train_stats.transpose()
     print(train_stats)
     print(train_dataset.keys())
+
     # 数据规范化，归一化
     def norm(x):
         return (x - train_stats['mean']) / train_stats['std']
@@ -224,7 +262,7 @@ if __name__ == '__main__':
     cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                      save_weights_only=True,
                                                      verbose=1)
-    train_labels=train_labels.astype('float64',errors='ignore')
+    train_labels = train_labels.astype('float64', errors='ignore')
     test_labels = test_labels.astype('float64', errors='ignore')
 
     log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -233,10 +271,9 @@ if __name__ == '__main__':
     history = model.fit(
         normed_train_data, train_labels,
         epochs=1000,
-         validation_split=0.2, verbose=0,
+        validation_split=0.2, verbose=0,
         validation_data=(test_dataset, test_labels),
-        callbacks=[cp_callback,early_stop,tensorboard_callback])
-
+        callbacks=[cp_callback, early_stop, tensorboard_callback])
 
     loss, mae, mse = model.evaluate(normed_test_data, test_labels, verbose=2)
     print(loss)
@@ -249,3 +286,73 @@ if __name__ == '__main__':
     print(test_predictions[:10])
 
     pass
+
+def test_spft():
+    stockdata = Stock_data('000002')
+    print(stockdata.data)
+    raw_dataset = pd.DataFrame(stockdata.data)
+    dataset = raw_dataset.copy()
+    train_dataset = dataset.sample(frac=0.8, random_state=0)
+    test_dataset = dataset.drop(train_dataset.index)
+
+    # 被目标值的定义卡住，目标值应该是之后哪个时间的成交价， 如果‘之后’这个时间固定的话又固定为什么
+    train_labels = train_dataset.pop('next2')
+    test_labels = test_dataset.pop('next2')
+
+    train_dataset = train_dataset.astype('float64', errors='ignore')
+    test_dataset = test_dataset.astype('float64', errors='ignore')
+    train_stats = train_dataset.describe()
+    # 转置
+    train_stats = train_stats.transpose()
+    print(train_stats)
+    print(train_dataset.keys())
+
+    # 数据规范化，归一化
+    def norm(x):
+        return (x - train_stats['mean']) / train_stats['std']
+
+    normed_train_data = norm(train_dataset)
+    normed_test_data = norm(test_dataset)
+
+    model = build_model(len(train_dataset.keys()))
+    model.summary()
+
+    early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+
+    checkpoint_path = "training/cp.ckpt"
+    checkpoint_dir = os.path.dirname(checkpoint_path)
+    print('file')
+    print(checkpoint_dir)
+    # 创建一个保存模型权重的回调
+    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                     save_weights_only=True,
+                                                     verbose=1)
+    train_labels = train_labels.astype('float64', errors='ignore')
+    test_labels = test_labels.astype('float64', errors='ignore')
+
+    log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+    history = model.fit(
+        normed_train_data, train_labels,
+        epochs=1000,
+        validation_split=0.2, verbose=0,
+        validation_data=(test_dataset, test_labels),
+        callbacks=[cp_callback, early_stop, tensorboard_callback])
+
+    loss, mae, mse = model.evaluate(normed_test_data, test_labels, verbose=2)
+    print(loss)
+    print(mae)
+    print(mse)
+    model.save('saved_model/my_model')
+    # plot_history(history)
+    test_predictions = model.predict(normed_test_data).flatten()
+    print(test_labels[:10])
+    print(test_predictions[:10])
+
+    pass
+if __name__ == '__main__':
+    stockdata= Stock_data('000002')
+    print(stockdata.data)
+    df = pd.DataFrame(stockdata.data)
+    print(df)

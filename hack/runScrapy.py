@@ -68,8 +68,6 @@ def dofund():
     job('dfcf_fund')
 
 def dongfangcaifu():
-    print('tests')
-
     if not rili.isStockDeal():
         return
     stock = Stock()

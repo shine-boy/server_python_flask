@@ -67,6 +67,7 @@ def describe(self):
 
 threadLock = threading.Lock()
 class Stock:
+
     stock_describe = {
         "f11": "买五",
         "f12": "成交数",
@@ -119,7 +120,6 @@ class Stock:
         "f169": "涨跌",
         "f170": "涨幅",
     }
-
     def __init__(self):
         self.threadManage = ThreadManage(1000)
 
