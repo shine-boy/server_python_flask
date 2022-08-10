@@ -2,6 +2,7 @@
 import subprocess
 import pymongo
 import sys
+import datetime
 import os
 # "%Y-%m-%d %H:%M:%S"
 def isNull(obj):
@@ -62,5 +63,18 @@ def mongodb_connect():
         myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     return myclient
 
+def build_date(now=datetime.datetime.now(), add_month=0, add_day=0):
+    month = now.month + add_month
+    year_ = int(month/12)
+    month = month%12
+    if month == 0:
+        year_ -=1
+        month = 12
+    result = datetime.datetime(year=now.year+year_, month=month, day=now.day)
+    timestamp = result.timestamp() + now.timestamp()%24*60*60 + add_day*24*60*60
+    return datetime.datetime.fromtimestamp(timestamp)
+
+
 if __name__ == '__main__':
     print(sys.argv)
+    print(build_date(add_day=30))

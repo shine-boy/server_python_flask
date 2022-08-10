@@ -2,7 +2,7 @@
 from hack.servers_api.serverApi import ServersApi
 import datetime
 from hack.include.list import findIndex, find_index
-from hack.util import isNull
+from hack.util import isNull, build_date
 import hack.include.rili as rili
 from hack.include.threadManage import ThreadManage
 class StockApi(ServersApi):
@@ -109,7 +109,7 @@ class StockApi(ServersApi):
         sort = [("time", -1)]
         def get_stock_short(i):
             current_time = shorts[i].get('time')
-            next_time = datetime.datetime(year=current_time.year, month=current_time.month, day=current_time.day + 1)
+            next_time = build_date(current_time, add_day=1)
             names = shorts[i].get('short') or []
             print(names)
             totalDB = self.myclient['stock_statistic']['totalDB']
@@ -151,13 +151,13 @@ class StockApi(ServersApi):
             i = 0
             while i < limit_day:
 
-                cur = datetime.datetime(year=now.year, month=now.month, day=now.day - i)
+                cur = build_date(now, add_day=-i)
                 if rili.isStockDeal(cur) is False:
                     limit_day += 1
                     i += 1
                     continue
 
-                temp_time = datetime.datetime(year=cur.year, month=cur.month, day=cur.day + 1)
+                temp_time = build_date(cur, add_day=1)
                 print(cur, temp_time)
                 exit = False
                 for short in shorts:
@@ -173,7 +173,7 @@ class StockApi(ServersApi):
 
         days, limit_day = updateDays(limit)
         # 0点
-        temp_time = datetime.datetime(year=now.year, month=now.month, day=now.day - limit_day + 1)
+        temp_time = build_date(now, add_day= 1-limit_day)
         # 删除超过需要汇总时间的数据
         shortDB.delete_many({
             "time": {"$lt": temp_time}
@@ -212,7 +212,7 @@ class StockApi(ServersApi):
                 for i in range(len(days)):
                     current_time = days[i]
 
-                    next_time = datetime.datetime(year=current_time.year, month=current_time.month, day=current_time.day + 1)
+                    next_time = build_date(current_time, add_day=1)
                     data = stockDB.find({"time": {"$gte": current_time, "$lt": next_time}}).sort(sort).limit(1)
                     data= list(data)
                     if len(data) > 0:
@@ -285,7 +285,7 @@ class Statistic :
                 }
                 for cur in days:
                     try:
-                        next_time = rili.next_n_day(cur)
+                        next_time = build_date(cur, add_day=1)
                         data = db[code].find({"time": {"$gte": cur, "$lt": next_time}}).sort(sort).limit(1)
                         data = list(data)
                         if len(data) > 0:
@@ -323,6 +323,104 @@ class Statistic :
             result = result[:limit]
         return results
 
+    # 统计一天中最低点与最高点
+    def day_calculate(self, code):
+        db = self.mongoClient['dongfangcaifu'][code]
+        start_date = datetime.datetime(year=2020, month=1, day=1)
+        now = datetime.datetime.now()
+        current_time = datetime.datetime(year=now.year, month=now.month, day=now.day)
+        attibute = 'f43'
+        day_db = self.mongoClient['statistic_day'][code]
+        while current_time > start_date:
+            if rili.isStockDeal(current_time):
+                result = {
+                    'min': 100000,
+                    'max': 0,
+                    'time': current_time
+                }
+                next_time = build_date(current_time, add_day=1)
+                query = {"time": {"$gte": current_time, "$lt": next_time}}
+                sort = [("time", -1)]
+                if day_db.find_one(query) is not None:
+                    break
+                data = db.find(query).sort(sort)
+                data = list(data)
+                if len(data) > 0:
+                    for da in data:
+                        if da.get(attibute) < result['min']:
+                            result['min'] = da.get(attibute)
+                            result['min_time'] = da.get('time')
+                        if da.get(attibute) > result['max']:
+                            result['max'] = da.get(attibute)
+                            result['max_time'] = da.get('time')
+                    day_db.insert_one(result)
+            current_time = build_date(current_time, add_day=-1)
+
+    # 统计一星期中最低点与最高点
+    def week_calculate(self, code):
+            db = self.mongoClient['dongfangcaifu'][code]
+            start_date = datetime.datetime(year=2020, month=1, day=1)
+            now = datetime.datetime.now()
+            current_time = datetime.datetime.fromtimestamp(datetime.datetime(year=now.year, month=now.month, day=now.day).timestamp() - (now.isoweekday() - 1) * 24*60*60)
+            attibute = 'f43'
+            week_db = self.mongoClient['statistic_week'][code]
+            while current_time > start_date:
+                result = {
+                    'min': 100000,
+                    'max': 0,
+                    'time': current_time
+                }
+                next_time = build_date(current_time, add_day=7)
+                query = {"time": {"$gte": current_time, "$lt": next_time}}
+                sort = [("time", -1)]
+                if week_db.find_one(query) is not None:
+                    break
+                data = db.find(query).sort(sort)
+                data = list(data)
+                if len(data) > 0:
+                    for da in data:
+                        if da.get(attibute) < result['min']:
+                            result['min'] = da.get(attibute)
+                            result['min_time'] = da.get('time')
+                        if da.get(attibute) > result['max']:
+                            result['max'] = da.get(attibute)
+                            result['max_time'] = da.get('time')
+                    week_db.insert_one(result)
+                current_time = build_date(current_time, add_day=-7)
+
+    # 统计一月中最低点与最高点
+    def month_calculate(self, code):
+        db = self.mongoClient['dongfangcaifu'][code]
+        start_date = datetime.datetime(year=2020, month=1, day=1)
+        now = datetime.datetime.now()
+        current_time = datetime.datetime(year=now.year, month=now.month, day=1)
+        attibute = 'f43'
+        month_db = self.mongoClient['statistic_month'][code]
+        while current_time > start_date:
+            result = {
+                'min': 100000,
+                'max': 0,
+                'time': current_time
+            }
+            next_time = build_date(current_time, add_month=1)
+            query = {"time": {"$gte": current_time, "$lt": next_time}}
+            sort = [("time", -1)]
+            if month_db.find_one(query) is not None:
+                break
+            data = db.find(query).sort(sort)
+            data = list(data)
+            if len(data) > 0:
+                for da in data:
+                    if da.get(attibute) < result['min']:
+                        result['min'] = da.get(attibute)
+                        result['min_time'] = da.get('time')
+                    if da.get(attibute) > result['max']:
+                        result['max'] = da.get(attibute)
+                        result['max_time'] = da.get('time')
+                month_db.insert_one(result)
+            current_time = build_date(current_time, add_month=-1)
+
+
     def calculate(self):
         db = self.statisticdb['calculate']
         names = self.getNames()
@@ -340,4 +438,5 @@ if __name__ == '__main__':
     cur = datetime.datetime(year=now.year, month=now.month, day=now.day - 1)
     da = Statistic()
     print('价值', '涨幅')
-    print(da.near_day(10,30, ['f43', 'f170']))
+    print(datetime.datetime(year=now.year, month=12, day=1))
+    print(da.month_calculate('000002'))

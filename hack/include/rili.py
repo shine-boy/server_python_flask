@@ -59,8 +59,6 @@ def isStockDeal(day=datetime.now()):
     #             return True
     # return False
 
-def next_n_day(day=datetime.now(), n=1):
-    return datetime.fromtimestamp(day.timestamp() + n*24*60*60)
 
 # 获取最近limit股票交易日
 def stock_days(limit, now=datetime.now()):
