@@ -22,6 +22,7 @@ from flask import Response, Flask, request, make_response
 from flask_cors import CORS
 import hack.include.rili as rili
 from hack.servers_api import StockApi, FundApi
+from hack.stock import Statistic
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.config['JSONIFY_MIMETYPE'] = "application/json;charset=utf-8"
@@ -101,6 +102,7 @@ def do_dongfangcaifu():
 def doSched():
     print('start')
     print(datetime.datetime.now())
+    statistic = Statistic()
     schedList = {
         '网易云':{
             'func': dowangyiyun,
@@ -127,6 +129,15 @@ def doSched():
                 'day_of_week': "0-4",
                 'misfire_grace_time': 3600,
                 'hour': '8'
+            }
+        },
+        '股票统计': {
+            'func': statistic.calculate,
+            'args': {
+                'type': 'cron',
+                'day_of_week': "0-4",
+                'misfire_grace_time': 3600,
+                'hour': '18'
             }
         }
     }

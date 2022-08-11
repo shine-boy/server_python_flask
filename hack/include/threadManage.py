@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 import threading
 
-threadLock = threading.Lock()
+
 class ThreadManage:
 
     def __init__(self,maxthreading=1000):
@@ -69,9 +69,7 @@ class ThreadManage:
         self.active = False
 
 
-
-
-
+threadManage=ThreadManage(1000)
 
 if __name__ == '__main__':
     stock=ThreadManage(1)
