@@ -335,6 +335,7 @@ if __name__ == '__main__':
     time.sleep(3);
     threading.Thread(target=doSched).start()
     server = make_server('0.0.0.0', 5000, app)
-    server.serve_forever()
     print('run: 0.0.0.0:5000')
+    server.serve_forever()
+
     # pass

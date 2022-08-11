@@ -229,6 +229,7 @@ class Statistic:
             result = results[attribute]
             result.sort(key=sortfunc, reverse=True)
             result = result[:limit]
+            results[attribute] = result
         return results
 
     # 统计一天中最低点与最高点
