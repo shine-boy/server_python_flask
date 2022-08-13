@@ -4,10 +4,12 @@ from flask_cors import CORS
 import json
 from hack.include import Page, Sort
 from hack.util import mongodb_connect
+from hack.journal import Journal
 import traceback
 class Request:
     def __init__(self, app: Flask):
         self.app = app
+        self.journal = Journal()
         pass
 
     def register(self, url, methods=['get']):
@@ -28,7 +30,7 @@ class Request:
                         pass
                     # exc_type, exc_value, exc_traceback = sys.exc_info()
                     # result = str(repr(traceback.format_exception(exc_type, exc_value, exc_traceback)))  # 将异常信息转为字符串
-                    print(result)
+                    self.journal.save(e, url)
                     pass
                 return self.set_response(result)
         return do

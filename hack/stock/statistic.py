@@ -5,11 +5,13 @@ from hack.util import build_date
 import hack.include.rili as rili
 from hack.include.list import findIndex, find_index
 import datetime
+from hack.journal import Journal
 class Statistic:
     def __init__(self, mongoClient=None):
         self.mongoClient = mongoClient or mongodb_connect()
         self.threadManage = threadManage
         self.statisticdb = self.mongoClient['stock_statistic']
+        self.journal = Journal(self)
 
     def n_diff(self, code, n=5, attribute="f57"):
         try:
@@ -209,6 +211,7 @@ class Statistic:
                         next = data
                     except Exception as e:
                         print(e, data)
+                        self.journal.save(e)
                         continue
                 for attribute in attributes:
                     result = results[attribute]
@@ -256,12 +259,15 @@ class Statistic:
                 data = list(data)
                 if len(data) > 0:
                     for da in data:
-                        if da.get(attibute) < result['min']:
-                            result['min'] = da.get(attibute)
-                            result['min_time'] = da.get('time')
-                        if da.get(attibute) > result['max']:
-                            result['max'] = da.get(attibute)
-                            result['max_time'] = da.get('time')
+                        try:
+                            if da.get(attibute) < result['min']:
+                                result['min'] = da.get(attibute)
+                                result['min_time'] = da.get('time')
+                            if da.get(attibute) > result['max']:
+                                result['max'] = da.get(attibute)
+                                result['max_time'] = da.get('time')
+                        except Exception as e:
+                            self.journal.save(e)
                     day_db.insert_one(result)
             current_time = build_date(current_time, add_day=-1)
 
@@ -290,12 +296,15 @@ class Statistic:
             data = list(data)
             if len(data) > 0:
                 for da in data:
-                    if da.get(attibute) < result['min']:
-                        result['min'] = da.get(attibute)
-                        result['min_time'] = da.get('time')
-                    if da.get(attibute) > result['max']:
-                        result['max'] = da.get(attibute)
-                        result['max_time'] = da.get('time')
+                    try:
+                        if da.get(attibute) < result['min']:
+                            result['min'] = da.get(attibute)
+                            result['min_time'] = da.get('time')
+                        if da.get(attibute) > result['max']:
+                            result['max'] = da.get(attibute)
+                            result['max_time'] = da.get('time')
+                    except Exception as e:
+                        self.journal.save(e)
                 week_db.insert_one(result)
             current_time = build_date(current_time, add_day=-7)
 
@@ -322,12 +331,15 @@ class Statistic:
             data = list(data)
             if len(data) > 0:
                 for da in data:
-                    if da.get(attibute) < result['min']:
-                        result['min'] = da.get(attibute)
-                        result['min_time'] = da.get('time')
-                    if da.get(attibute) > result['max']:
-                        result['max'] = da.get(attibute)
-                        result['max_time'] = da.get('time')
+                    try:
+                        if da.get(attibute) < result['min']:
+                            result['min'] = da.get(attibute)
+                            result['min_time'] = da.get('time')
+                        if da.get(attibute) > result['max']:
+                            result['max'] = da.get(attibute)
+                            result['max_time'] = da.get('time')
+                    except Exception as e:
+                        self.journal.save(e)
                 month_db.insert_one(result)
             current_time = build_date(current_time, add_month=-1)
 
@@ -345,4 +357,7 @@ class Statistic:
 
 if __name__ == '__main__':
     statistic = Statistic()
-    statistic.updateToday(3)
+    import re
+    print(re.match(".*", ''))
+    print( statistic.__str__().split(' ').pop(0).replace('<', '').split('.').pop(), statistic.__class__)
+    # statistic.calculate()
