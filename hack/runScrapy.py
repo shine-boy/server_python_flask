@@ -7,6 +7,7 @@ import sys
 # path = os.path.abspath('./..')
 # sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # 会追加到列表最尾部
 sys.path.append(os.getcwd())  # 会追加到列表最尾部
+
 import hack.include.excel as myExcel
 from hack.util import isNull, kill_port, mongodb_connect
 from hack.include.timeManager import TimeManager
