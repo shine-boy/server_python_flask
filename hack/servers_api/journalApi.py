@@ -21,7 +21,10 @@ class JournalApi(ServersApi):
             sort = self.Sort({
                 'order': data.get('order')
             }).sort
-            query = {}
+            query = {
+            }
+            if type is not  None:
+                query['type'] = type
             lis = news.find(query).sort(sort).limit(page.get("pageSize")).skip(
                 page.get("pageSize") * (page.get("current") - 1))
             lis = list(lis)
