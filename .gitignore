@@ -7,3 +7,5 @@ venv
 /build/*
 /hack/binary/data
 **/logs
+*.pyc
+**/__pycache__

@@ -345,4 +345,4 @@ class Statistic:
 
 if __name__ == '__main__':
     statistic = Statistic()
-    statistic.calculate()
+    statistic.updateToday(3)
