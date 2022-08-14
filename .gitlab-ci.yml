@@ -37,6 +37,7 @@ deploy-job:
   script:
 #    - sudo systemctl stop python_flask.service
 #    - sudo systemctl start python_flask.service
+    - echo $CI_PROJECT_NAMESPACE
     - sudo nohup python3 $CI_PROJECT_NAMESPACE + hack/runScrapy.py SERVER > pythonlog.file 2>&1 &
 #    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/build
 #    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/dist
