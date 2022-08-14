@@ -20,13 +20,13 @@ install:
   allow_failure: true
 
 
-#build-job:
-#  tags:
-#    - sss
-#  stage: build
-#  script:
-##    - sudo pyinstaller -F hack/runScrapy.py
-##    - sudo -S cp -r -p ./dist/* /var/myClient/pythonFlask
+build-job:
+  tags:
+    - sss
+  stage: build
+  script:
+    - sudo pyinstaller -F hack/runScrapy.py
+    - sudo -S cp -r -p ./dist/* /var/myClient/pythonFlask
 #    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/build
 #    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/dist
 
@@ -35,11 +35,9 @@ deploy-job:
     - run
   stage: start
   script:
-#    - sudo systemctl stop python_flask.service
-#    - sudo systemctl start python_flask.service
-    - pipenv shell
-    - echo $CI_PROJECT_DIR/hack/runScrapy.py
-    - sudo nohup python3 $CI_PROJECT_DIR/hack/runScrapy.py SERVER > pythonlog.file 2>&1 &
-#    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/build
-#    - sudo rm -rf /home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask/dist
+    - sudo systemctl stop python_flask.service
+    - sudo systemctl start python_flask.service
+#    - pipenv shell
+#    - echo $CI_PROJECT_DIR/hack/runScrapy.py
+#    - sudo nohup python3 $CI_PROJECT_DIR/hack/runScrapy.py SERVER > pythonlog.file 2>&1 &
     # - rsync -r --delete ./dist root@xxx.xxx.xxx.xxx:/usr/share/nginx/html
