@@ -9,8 +9,33 @@ import traceback
 class Request:
     def __init__(self, app: Flask):
         self.app = app
-        self.journal = Journal()
+        self.journal = Journal(self)
         pass
+
+
+class DateEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(obj, datetime.date):
+            return obj.strftime("%Y-%m-%d")
+        else:
+            return json.JSONEncoder.default(self, obj)
+
+
+class ServersApi(Request):
+    def __init__(self, app:Flask):
+        self.lastConnectTime = datetime.datetime.now()
+        self.Page = Page
+        self.myclient = mongodb_connect()
+        self.Sort = Sort
+        self.app = app
+        self.journal = Journal(self)
+        pass
+
+    def re_connect(self):
+        if datetime.datetime.now() - self.lastConnectTime > 10*1000*60:
+            self.myclient = mongodb_connect()
 
     def register(self, url, methods=['get']):
         def do(func):
@@ -25,12 +50,13 @@ class Request:
                     result = str(e)
                     if self.myclient:
                         #  mongo连接失败重连
-                        if result.index(':27017') > -1:
+                        print(result)
+                        if result.find(':27017') > -1:
                             self.re_connect()
                         pass
                     # exc_type, exc_value, exc_traceback = sys.exc_info()
                     # result = str(repr(traceback.format_exception(exc_type, exc_value, exc_traceback)))  # 将异常信息转为字符串
-                    self.journal.save(e, url)
+                    self.journal.save(e, url )
                     pass
                 return self.set_response(result)
         return do
@@ -38,7 +64,7 @@ class Request:
     def set_response(self, result):
         response = Response()
         response.headers = {"Access-Control-Allow-Origin": "*"}
-        response.data = json.dumps(result).encode('utf-8')
+        response.data = json.dumps(result, cls=DateEncoder).encode('utf-8')
         return response
 
     def get_date(self):
@@ -49,21 +75,13 @@ class Request:
                 data = request.form
         else:
             data = request.args
+        if request.files is not None and len(request.files) > 0:
+            data['file'] = request.files['file']
+        if request.form is not None:
+            data['form'] = request.form.to_dict()
+
         return data
 
-
-class ServersApi(Request):
-    def __init__(self, app:Flask):
-        self.lastConnectTime = datetime.datetime.now()
-        Request.__init__(self, app)
-        self.Page = Page
-        self.myclient = mongodb_connect()
-        self.Sort = Sort
-        pass
-
-    def re_connect(self):
-        if datetime.datetime.now() - self.lastConnectTime > 10*1000*60:
-            self.myclient = mongodb_connect()
     # def __get__(self, instance, owner):
     #     print(instance, owner, 'gfgfgf')
 

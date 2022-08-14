@@ -29,7 +29,6 @@ class JournalApi(ServersApi):
                 page.get("pageSize") * (page.get("current") - 1))
             lis = list(lis)
             for i in lis:
-                print(i['time'], i['time'].timestamp())
                 i['time'] = i['time'].timestamp() * 1000
                 del i['_id']
             result = {

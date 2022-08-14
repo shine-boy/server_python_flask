@@ -4,7 +4,6 @@ import datetime
 class Journal:
     def __init__(self, name: str or object = ''):
         self.journal_db = mongodb_connect()['journal']
-        print(type(name))
         if type(name) != str:
             self.name = name.__str__().split(' ').pop(0).replace('<', '').split('.').pop()
         else:
@@ -15,7 +14,7 @@ class Journal:
         error_message = str(error)
         result = {
             'type': type,
-            'time:': datetime.datetime.now(),
+            'time': datetime.datetime.now(),
             'message': error_message,
             'name': self.name,
             "key": key

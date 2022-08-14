@@ -8,8 +8,7 @@ import sys
 # sys.path.append('/home/gitlab-runner/builds/tYTjy6R-/0/root/server_python_flask')  # 会追加到列表最尾部
 sys.path.append(os.getcwd())  # 会追加到列表最尾部
 
-import hack.include.excel as myExcel
-from hack.util import isNull, kill_port, mongodb_connect
+from hack.util import kill_port
 from hack.include.timeManager import TimeManager
 import threading
 from wsgiref.simple_server import make_server
@@ -19,17 +18,13 @@ from hack.include import Stock,Page
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
-from flask import Response, Flask, request, make_response
-from flask_cors import CORS
+from flask import Flask, request
 import hack.include.rili as rili
-from hack.servers_api import StockApi, FundApi, JournalApi
+from hack.servers_api import StockApi, FundApi, JournalApi, OtherApi
 from hack.stock import Statistic
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.config['JSONIFY_MIMETYPE'] = "application/json;charset=utf-8"
-myclient = mongodb_connect()
-mydb = myclient["local"]
-projectExam=myclient["projectExam"]
 sched = BackgroundScheduler()
 
 def job(name):
@@ -178,148 +173,6 @@ def runcmd():
     threading.Thread(target=cmd_job,args=(data,)).start()
     return ""
 
-CORS(app,resources=r"/*")
-@app.route('/deleteWangyiyun', methods=['POST','GET'])
-def deleteWangyiyun():
-    if request.method == 'POST':
-        if request.data:
-            data = json.loads(request.data)
-        else:
-            data=request.form
-    else:
-        data = request.args
-    comments = mydb["comments"]
-    
-    query = {'id':data["id"]}
-    comments.delete_one(query)
-    response=Response()
-    response.headers={"Access-Control-Allow-Origin":"*"}
-    response.data=json.dumps({'data':"success"})
-    return response
-
-class DateEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            return obj.strftime('%Y-%m-%d %H:%M:%S')
-        elif isinstance(obj, datetime.date):
-            return obj.strftime("%Y-%m-%d")
-        else:
-            return json.JSONEncoder.default(self, obj)
-
-CORS(app,resources=r"/*")
-@app.route('/wangyiyun', methods=['POST','GET'])
-def seachWangyiyun():
-    if request.method == 'POST':
-        if request.data:
-            data = json.loads(request.data)
-        else:
-            data=request.form
-    else:
-        data = request.args
-    page=Page(data.get("page")).page
-
-    comments = mydb["comments"]
-    query = {"comments.likedCount":{"$gt":2}}
-    sort=[]
-    sortType = data.get("sort")
-    if sortType is None:
-        sort=[("comments.likedCount", -1)]
-    else:
-        sort=[(sortType,-1)]
-    lis = comments.find(query, { "_id":0}).sort(sort).limit(page.get("pageSize")).skip(page.get("pageSize")*(page.get("current")-1))
-    lis = list(lis)
-    #
-    result={
-        'data':lis,
-        'total':comments.estimated_document_count()
-    }
-    print(len(lis))
-    response=Response()
-    response.headers={"Access-Control-Allow-Origin":"*"}
-    response.data=json.dumps(result,cls=DateEncoder)
-    return response
-
-CORS(app,resources=r"/*")
-@app.route('/projectExam', methods=['POST','GET'])
-def seachprojectExam():
-    if request.method == 'POST':
-        if request.data:
-            data = json.loads(request.data)
-        else:
-            data=request.form
-    else:
-        data = request.args
-    page=Page(data.get("page")).page
-    type_=data.get("questionType","choice")
-    comments = projectExam[type_]
-    query = {}
-    if isNull(data.get("content")) is False:
-        query['content']={'$regex':".*"+data.get("content")+".*"}
-    if isNull(data.get("type")) is False:
-        query['type']={'$regex':".*"+data.get("type")+".*"}
-    print(page)
-    lis = comments.find(query,{"_id":0}).limit(page.get("pageSize")).skip(page.get("pageSize")*(page.get("current")-1))
-    lis = list(lis)
-    #
-    # print(comments.count_documents(filter=query))
-    result = {
-        'data': lis,
-        'total': comments.count_documents(filter=query)
-    }
-    response=Response()
-    response.headers={"Access-Control-Allow-Origin":"*"}
-    response.data=json.dumps(result)
-    return response
-
-@app.route('/uploadProjectExel', methods=['POST'])
-def uploadProjectExel():
-    try:
-        my_file = request.files['file']
-        # print(my_file)
-        data = None
-        if request.form:
-            data = request.form.to_dict()
-
-        if data and data.get('type') == '1':
-            resfile = myExcel.jibing(my_file, head=data.get('header'), filter=data.get('filter'))
-        else:
-            resfile = myExcel.waike(my_file, head=data.get('header'), filter=data.get('filter'))
-    except Exception as e:
-        print(e)
-        pass
-    response = Response(resfile)
-
-    # response=make_response(resfile)
-
-    response.headers={"Access-Control-Allow-Origin":"*", 'Content-Type': "application/vnd.ms-excel"}
-    response.headers['Content-Disposition'] = 'attachment; filename=FileName.xls'
-    return response
-
-#英文翻译，保存至englishdic
-CORS(app,resources=r"/*")
-@app.route('/fanyi', methods=['POST','GET'])
-def fanyi():
-    if request.method == 'POST':
-        if request.data:
-            data = json.loads(request.data)
-        else:
-            data=request.form
-    else:
-        data = request.args
-    dicCollection = mydb['englishdic']
-
-    query = {}
-    query[data.get('from')]=data.get('result')
-    query[data.get('to')]=data.get('q')
-    result = dicCollection.find(query)
-    print(result)
-
-    #
-    #
-    response=Response()
-    response.headers={"Access-Control-Allow-Origin":"*"}
-    response.data=json.dumps(result)
-    return response
 
 
 # schedule.every().wednesday.at("15:50").do(doWeek,wednesdayList)
@@ -330,6 +183,7 @@ if __name__ == '__main__':
     stockApi = StockApi(app)
     fundApi = FundApi(app)
     journalApi = JournalApi(app)
+    otherApi = OtherApi(app)
     # while True:
     #     schedule.run_pending()
     #     time.sleep(1)
