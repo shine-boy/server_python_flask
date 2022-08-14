@@ -22,7 +22,7 @@ install:
 
 build-job:
   tags:
-    - sss
+    - run
   stage: build
   script:
     - sudo pyinstaller -F hack/runScrapy.py
