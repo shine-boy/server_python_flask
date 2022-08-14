@@ -1,4 +1,4 @@
-
+# coding=utf-8
 from hack.util import mongodb_connect
 import datetime
 class Journal:
@@ -21,4 +21,4 @@ class Journal:
         }
         self.journal_db['new'].insert_one(result)
         # exc_type, exc_value, exc_traceback = sys.exc_info()
-        # result = str(repr(traceback.format_exception(exc_type, exc_value, exc_traceback)))  # 将异常信息转为字符串
+        # result = str(repr(traceback.format_exception(exc_type, exc_value, exc_traceback)))  # 灏嗗紓甯镐俊鎭浆涓哄瓧绗︿覆
