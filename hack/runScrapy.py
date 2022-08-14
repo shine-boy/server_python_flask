@@ -22,7 +22,7 @@ import time
 from flask import Response, Flask, request, make_response
 from flask_cors import CORS
 import hack.include.rili as rili
-from hack.servers_api import StockApi, FundApi
+from hack.servers_api import StockApi, FundApi, JournalApi
 from hack.stock import Statistic
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -329,6 +329,7 @@ def fanyi():
 if __name__ == '__main__':
     stockApi = StockApi(app)
     fundApi = FundApi(app)
+    journalApi = JournalApi(app)
     # while True:
     #     schedule.run_pending()
     #     time.sleep(1)
