@@ -37,7 +37,7 @@ deploy-job:
   script:
 #    - sudo systemctl stop python_flask.service
 #    - sudo systemctl start python_flask.service
-    - pipenv shell
+#    - pipenv shell
     - echo $CI_PROJECT_DIR/hack/runScrapy.py
     - sudo nohup python3 $CI_PROJECT_DIR/hack/runScrapy.py SERVER > pythonlog.file 2>&1 &
     # - rsync -r --delete ./dist root@xxx.xxx.xxx.xxx:/usr/share/nginx/html
