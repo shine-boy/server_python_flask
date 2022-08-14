@@ -8,7 +8,7 @@ cache: &global_cache
 stages: # 分段
   - install
   # - eslint
-#  - build
+  - build
   - start
 
 install:
