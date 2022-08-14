@@ -4,16 +4,17 @@ import datetime
 class Journal:
     def __init__(self, name: str or object = ''):
         self.journal_db = mongodb_connect()['journal']
-        if type(name) == object:
+        print(type(name))
+        if type(name) != str:
             self.name = name.__str__().split(' ').pop(0).replace('<', '').split('.').pop()
         else:
             self.name = name
         pass
 
-    def save(self, error: Exception, key:str = 'error'):
+    def save(self, error: Exception, key:str = 'error', type='error'):
         error_message = str(error)
         result = {
-            'type': 'error',
+            'type': type,
             'time:': datetime.datetime.now(),
             'message': error_message,
             'name': self.name,

@@ -357,7 +357,5 @@ class Statistic:
 
 if __name__ == '__main__':
     statistic = Statistic()
-    import re
-    print(re.match(".*", ''))
-    print( statistic.__str__().split(' ').pop(0).replace('<', '').split('.').pop(), statistic.__class__)
-    # statistic.calculate()
+    print(type(statistic), 'gf')
+    statistic.calculate()
