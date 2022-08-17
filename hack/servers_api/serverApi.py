@@ -77,8 +77,8 @@ class ServersApi(Request):
             data = request.args
         if request.files is not None and len(request.files) > 0:
             data['file'] = request.files['file']
-        if request.form is not None:
-            data['form'] = request.form.to_dict()
+        # if request.form is not None:
+            # data['form'] = request.form.to_dict()
 
         return data
 
