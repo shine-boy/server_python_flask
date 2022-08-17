@@ -3,7 +3,7 @@ import datetime
 import os
 import sys
 
-linux下包导入失败
+# linux下包导入失败
 path = os.path.abspath('./..')
 sys.path.append('/home/gitlab-runner/builds/NsGaLx8a/0/root/server_python_flask')  # 会追加到列表最尾部
 sys.path.append(os.getcwd())  # 会追加到列表最尾部
