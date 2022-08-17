@@ -56,6 +56,7 @@ def mongodb_connect():
     try:
         env_ = sys.argv[1]
         if env_ == 'SERVER':
+            print('connect:', env_)
             myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[1]))
         else:
             myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
