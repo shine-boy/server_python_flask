@@ -1,13 +1,16 @@
 
 # import pathlib
 #
-
+import sys
+import os
+from operator import le
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import os
+
 from hack.util import mongodb_connect
-import sys
+
+
 import pymongo
 import io
 # import seaborn as sns
@@ -179,6 +182,13 @@ class Stock_data:
         self.data = []
         self.get_data()
 
+    def filter_data(self, data):
+        result = []
+        for i in range(len(data)-1):
+            if data[i+1]['time'] - data[i]['time'] <= 180:
+                data[i]['next_avg'] = data[i+1]['f43']
+                result.append(data[i])
+        return result
     def get_data(self):
         keys = ['time', 'f11', 'f12', 'f13', 'f15', 'f17', 'f19', 'f31', 'f33', 'f35', 'f37', 'f39', 'f43', 'f44', 'f45',
                'f46', 'f47', 'f48', 'f49', 'f50','f52', 'f60', 'f71', 'f135', 'f136', 'f137', 'f138', 'f139', 'f141', 'f142', 'f144', 'f145',
@@ -207,6 +217,7 @@ class Stock_data:
             res['c_time'] = res['time'] % (24 * 60 * 60 * 1000) - (9.5 - 8) * 60 * 60 * 1000
             if should_remove(res) is False:
                 self.data.append(res)
+        self.data = self.filter_data(self.data)
 
 # 以前的main方法
 def pre_main():
@@ -296,8 +307,8 @@ def test_spft():
     test_dataset = dataset.drop(train_dataset.index)
 
     # 被目标值的定义卡住，目标值应该是之后哪个时间的成交价， 如果‘之后’这个时间固定的话又固定为什么
-    train_labels = train_dataset.pop('next2')
-    test_labels = test_dataset.pop('next2')
+    train_labels = train_dataset.pop('next_avg')
+    test_labels = test_dataset.pop('next_avg')
 
     train_dataset = train_dataset.astype('float64', errors='ignore')
     test_dataset = test_dataset.astype('float64', errors='ignore')
@@ -352,7 +363,8 @@ def test_spft():
 
     pass
 if __name__ == '__main__':
-    stockdata= Stock_data('000002')
-    print(stockdata.data)
-    df = pd.DataFrame(stockdata.data)
-    print(df)
+    test_spft()
+    # stockdata= Stock_data('000002')
+    # print(stockdata.data)
+    # df = pd.DataFrame(stockdata.data)
+    # print(df)
