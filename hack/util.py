@@ -25,12 +25,12 @@ def getKeys_dic(obj,keys=[]):
 
 # 杀死进程
 def kill_port(port):
-    resu = subprocess.Popen("lsof -i:" + port, shell=True, stdout=subprocess.PIPE)
+    resu = subprocess.Popen("lsof -i:" + str(port), shell=True, stdout=subprocess.PIPE)
     resu.wait()
     result = resu.stdout.read()
     if result is None or result == b'':
         return
-    print(result)
+    print('kill_port', result)
     result = str(result, encoding='gbk')
     lis = result.split('\n')
     # 删除 空白字符
@@ -57,11 +57,12 @@ def mongodb_connect():
         env_ = sys.argv[1]
         if env_ == 'SERVER':
             print('connect:', env_)
-            myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[1]))
+            myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[0]))
         else:
             myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     except Exception as e:
         myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+    print(myclient['dongfangcaifu'])
     return myclient
 
 def build_date(now=datetime.datetime.now(), add_month=0, add_day=0):
@@ -78,4 +79,5 @@ def build_date(now=datetime.datetime.now(), add_month=0, add_day=0):
 
 if __name__ == '__main__':
     print(sys.argv)
+    mongodb_connect()
     print(build_date(add_day=30))

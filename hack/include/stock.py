@@ -1,3 +1,4 @@
+from hack.journal.journal import Journal
 import tushare as ts
 import requests
 import json
@@ -122,7 +123,7 @@ class Stock:
     }
     def __init__(self):
         self.threadManage = ThreadManage(1000)
-
+        self.journal = Journal(self)
         myclient = util.mongodb_connect()
         self.mydb = myclient["dongfangcaifu"]
         self.url="http://6.push2.eastmoney.com/api/qt/clist/get"
@@ -170,18 +171,21 @@ class Stock:
             self.param['cb'] = 'jQuery112407522976605656146_' + str(int(current.timestamp()))
             # print(self.param)
             url = self.url + "?" + parse.urlencode(self.param)
-            res = requests.get(url)
-            if res.status_code == 200:
-                data = json.loads(res.text[res.text.find("{"):-2])
+            try:
+                res = requests.get(url)
+                if res.status_code == 200:
+                    data = json.loads(res.text[res.text.find("{"):-2])
 
-                if data.get('data') is not None:
-                    for da in data.get('data').get("diff"):
-                        threadLock.acquire()
-                        if m_list.find(self.stocks,da['f12']) is False:
-                            self.stocks.append(da['f12'])
-                        threadLock.release()
-                    page+=1
-                    get(item,page)
+                    if data.get('data') is not None:
+                        for da in data.get('data').get("diff"):
+                            threadLock.acquire()
+                            if m_list.find(self.stocks,da['f12']) is False:
+                                self.stocks.append(da['f12'])
+                            threadLock.release()
+                        page+=1
+                        get(item,page)
+            except Exception as e:
+                self.journal.save(e, 'get_stocks')
         menus=self.find(["沪深京板块",'概念板块'])
         for menu in menus:
             self.run(get,menu,1)
@@ -250,10 +254,13 @@ class Stock:
 
         param['cb'] = 'jQuery112407522976605656146_' + str(int(current.timestamp()))
         url+="?"+parse.urlencode(param)
-        res=requests.get(url=url,headers=self.headers)
-        if res.status_code == 200:
-            data = json.loads(res.text[res.text.find("{"):-2])
-            return data.get('data')
+        try:
+            res=requests.get(url=url,headers=self.headers)
+            if res.status_code == 200:
+                data = json.loads(res.text[res.text.find("{"):-2])
+                return data.get('data')
+        except Exception as e:
+            self.journal.save(e, 'marketAnalysis')
         return None
 
 

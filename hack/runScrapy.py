@@ -188,11 +188,12 @@ if __name__ == '__main__':
     # while True:
     #     schedule.run_pending()
     #     time.sleep(1)
-    kill_port('5000')
+    port = 5000
+    kill_port(port)
     time.sleep(3);
     threading.Thread(target=doSched).start()
-    server = make_server('0.0.0.0', 5000, app)
-    print('run: 0.0.0.0:5000')
+    server = make_server('0.0.0.0', port, app)
+    print('run: 0.0.0.0:' + str(port))
     server.serve_forever()
 
     # pass

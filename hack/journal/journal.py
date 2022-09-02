@@ -10,14 +10,14 @@ class Journal:
             self.name = name
         pass
 
-    def save(self, error: Exception, key:str = 'error', type='error'):
+    def save(self, error: Exception, description:str = 'error', type='error'):
         error_message = str(error)
         result = {
             'type': type,
             'time': datetime.datetime.now(),
             'message': error_message,
             'name': self.name,
-            "key": key
+            "key": description
         }
         self.journal_db['new'].insert_one(result)
         # exc_type, exc_value, exc_traceback = sys.exc_info()
