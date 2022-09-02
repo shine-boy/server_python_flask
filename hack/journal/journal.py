@@ -17,7 +17,8 @@ class Journal:
             'time': datetime.datetime.now(),
             'message': error_message,
             'name': self.name,
-            "key": description
+            "key": description,
+            "description": description
         }
         self.journal_db['new'].insert_one(result)
         # exc_type, exc_value, exc_traceback = sys.exc_info()

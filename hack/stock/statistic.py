@@ -1,6 +1,6 @@
 # coding=utf-8
 from hack.util import mongodb_connect
-from hack.include.threadManage import threadManage
+from hack.include.threadManage import ThreadManage
 from hack.util import build_date
 import hack.include.rili as rili
 from hack.include.list import findIndex, find_index
@@ -9,7 +9,8 @@ from hack.journal import Journal
 class Statistic:
     def __init__(self, mongoClient=None):
         self.mongoClient = mongoClient or mongodb_connect()
-        self.threadManage = threadManage
+        self.threadManage = ThreadManage(1000)
+
         self.statisticdb = self.mongoClient['stock_statistic']
         self.journal = Journal(self)
 

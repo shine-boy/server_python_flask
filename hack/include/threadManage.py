@@ -31,13 +31,13 @@ class ThreadManage:
 
     def add(self,fun, args=(),*, timeout=120, endtime=None):
         temp = threading.Thread(target=fun, args=args)
-        result = self.threads
+        # result = self.threads
         now = datetime.now()
-        self.threads = [{
+        self.threads.index(0, {
             'endTime': endtime or datetime.fromtimestamp(now.timestamp() + timeout),
             'thread': temp
-        }]
-        self.threads.extend(result)
+        })
+        # self.threads.extend(result)
 
     def run(self):
         if self.active is True:
