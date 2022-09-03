@@ -20,7 +20,7 @@ import tensorflow as tf
 # #
 from tensorflow import keras
 from tensorflow.keras import layers
-
+from hack.include.threadManage import ThreadManage
 
 myclient = pymongo.MongoClient("mongodb://192.168.142.1:27017")
 mydb = myclient['dongfangcaifu']
@@ -86,7 +86,7 @@ def divide_type(label, types=[]):
 def to_one(label, dataFrame):
     column = dataFrame[label].copy()
     types = divide_type(label, column.unique())
-    print(types)
+    # print(types)
     for i in range(column.size):
         column.loc[i] = findIndex(types, column[i])
     dataFrame[label] = column
@@ -177,10 +177,47 @@ def plot_history(history):
 class Stock_data:
     def __init__(self, code, startDate=None):
         myMongo = mongodb_connect()
-        self.mydb = myMongo['dongfangcaifu'][code]
+        self.mydb = myMongo['dongfangcaifu']
         self.startDate = startDate
-        self.data = []
-        self.get_data()
+        self.data = pd.DataFrame()
+        self.threadManage = ThreadManage()
+        if code != '':
+            self.data = pd.DataFrame(self.get_data(code))
+        else:
+            names = self.mydb['names'].find()
+            names = list(names)
+            def sava(name):
+                code = name['code']
+                print(name['code'])
+                data = []
+                # self.get_data(name['code'], self.last_data(code))
+                data = self.save_to_csv(data, code)
+                self.data = self.data.append(data)
+            for name in names:
+                self.threadManage.add(sava, (name, ))
+            self.threadManage.run()
+            self.threadManage.waiter()
+
+    def last_data(self, code):
+        try:
+            raw_dataset = pd.read_csv('../data/{}.csv'.format(code))
+            last = raw_dataset.tail(1)
+            print(last.iloc[0]['time'])
+            return last.iloc[0]['time']
+        except Exception as e:
+            print(e, code)
+        return None
+
+    def save_to_csv(self, data, code):
+        # raw_dataset = pd.read_csv('../data/{}.csv'.format(code))
+        # raw_dataset.append(data)
+        try:
+            data = pd.DataFrame(data)
+            data.to_csv("../data/{}.csv".format(code), index=False, mode='a')
+            return pd.read_csv('../data/{}.csv'.format(code))
+        except Exception as e:
+            print(e, code)
+        return pd.DataFrame([])
 
     def filter_data(self, data):
         result = []
@@ -189,25 +226,29 @@ class Stock_data:
                 data[i]['next_avg'] = data[i+1]['f43']
                 result.append(data[i])
         return result
-    def get_data(self):
+
+    def get_data(self, code, startDate=None):
         keys = ['time', 'f11', 'f12', 'f13', 'f15', 'f17', 'f19', 'f31', 'f33', 'f35', 'f37', 'f39', 'f43', 'f44', 'f45',
                'f46', 'f47', 'f48', 'f49', 'f50','f52', 'f60', 'f71', 'f135', 'f136', 'f137', 'f138', 'f139', 'f141', 'f142', 'f144', 'f145',
                'f147', 'f148', 'f161', 'f168', 'f169', 'f170']
         query = {}
-        if self.startDate:
-            query['time'] = {"$gte": self.startDate}
+        data = []
+        if startDate:
+            query['time'] = {"$gte": startDate}
         sort = [("time", -1)]
         projection = {
             '_id': 0
         }
         for key in keys:
             projection[key] = 1
-        result = self.mydb.find(query, projection).sort(sort)
+        result = self.mydb[code].find(query, projection).sort(sort)
         result = list(result)
         startYear = datetime(year=2020, month=1, day=1)
         def should_remove(item):
             for i in item:
-                print(type(item[i]))
+                # print(type(item[i]))
+                if item[i] == 0:
+                    return  True
                 if type(item[i]) is not int and type(item[i]) is not float:
                     return True
             return False
@@ -216,8 +257,8 @@ class Stock_data:
             # 当天交易时间9：30 = 0， 15：00 = 5.5*60*60, 减8是因为时间格式
             res['c_time'] = res['time'] % (24 * 60 * 60 * 1000) - (9.5 - 8) * 60 * 60 * 1000
             if should_remove(res) is False:
-                self.data.append(res)
-        self.data = self.filter_data(self.data)
+                data.append(res)
+        return self.filter_data(data)
 
 # 以前的main方法
 def pre_main():
@@ -298,11 +339,14 @@ def pre_main():
 
     pass
 
-def test_spft():
-    stockdata = Stock_data('000002')
-    print(stockdata.data)
-    raw_dataset = pd.DataFrame(stockdata.data)
+def test_spft(path='saved_model/my_model', code=''):
+
+    stockdata = Stock_data(code)
+    print(len(stockdata.data))
+    raw_dataset = stockdata.data
     dataset = raw_dataset.copy()
+    dataset = dataset.dropna()
+    print(dataset.size)
     train_dataset = dataset.sample(frac=0.8, random_state=0)
     test_dataset = dataset.drop(train_dataset.index)
 
@@ -316,12 +360,13 @@ def test_spft():
     # 转置
     train_stats = train_stats.transpose()
     print(train_stats)
-    print(train_dataset.keys())
+    # print(train_dataset.keys())
 
     # 数据规范化，归一化
     def norm(x):
         return (x - train_stats['mean']) / train_stats['std']
 
+    # 股票数据不适用归一化
     normed_train_data = norm(train_dataset)
     normed_test_data = norm(test_dataset)
 
@@ -340,8 +385,10 @@ def test_spft():
                                                      verbose=1)
     train_labels = train_labels.astype('float64', errors='ignore')
     test_labels = test_labels.astype('float64', errors='ignore')
-
-    log_dir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
+    log_path = "logs/fit/"
+    if code!= '':
+        log_path += code + '/'
+    log_dir = log_path + datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
     history = model.fit(
@@ -355,7 +402,7 @@ def test_spft():
     print(loss)
     print(mae)
     print(mse)
-    model.save('saved_model/my_model')
+    model.save(path+'_'+code)
     # plot_history(history)
     test_predictions = model.predict(normed_test_data).flatten()
     print(test_labels[:10])
@@ -364,6 +411,7 @@ def test_spft():
     pass
 if __name__ == '__main__':
     test_spft()
+    # print(type())
     # stockdata= Stock_data('000002')
     # print(stockdata.data)
     # df = pd.DataFrame(stockdata.data)

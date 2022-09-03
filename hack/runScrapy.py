@@ -136,6 +136,15 @@ def doSched():
                 'misfire_grace_time': 3600,
                 'hour': '18'
             }
+        },
+        '股票汇总': {
+            'func': statistic.updateToday,
+            'args': {
+                'type': 'cron',
+                'day_of_week': "0-4",
+                'misfire_grace_time': 3600,
+                'hour': '19'
+            }
         }
     }
     timeManager = TimeManager()

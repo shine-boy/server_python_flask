@@ -7,3 +7,5 @@ venv
 /build/*
 /hack/binary/data
 **/logs
+**/saved_model
+**/training

@@ -23,3 +23,6 @@ class Journal:
         self.journal_db['new'].insert_one(result)
         # exc_type, exc_value, exc_traceback = sys.exc_info()
         # result = str(repr(traceback.format_exception(exc_type, exc_value, exc_traceback)))  # 将异常信息转为字符串
+
+if __name__ == '__main__':
+    print('ffd{}'.format(1))

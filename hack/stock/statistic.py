@@ -54,14 +54,15 @@ class Statistic:
             self.threadManage.add(get_stock_short, (i,))
 
     # 更新股票汇总表
-    def updateToday(self, limit=1):
+    def updateToday(self, limit=0):
         sort = [('time', -1)]
         now = datetime.datetime.now()
         # 汇总表：汇总据目前limit天的数据
         totalDB = self.mongoClient['stock_statistic']['totalDB']
         # 本次更新未汇入的表信息，执行次方法时可能有部分数据欠缺
         shortDB = self.mongoClient['stock_statistic']['shortDB']
-
+        if limit == 0:
+            limit = len(list(shortDB.find()))
         # 获取需要更新的日期
         def updateDays(limit_day):
             days = []

@@ -21,23 +21,26 @@ class ThreadManage:
     def waiter(self):
         try:
             while len(self.running) > 0:
-                temp = self.running.pop()
+                temp = self.running.pop(0)
                 if temp.is_alive():
+                    print('running', len(self.running))
                     self.running.append(temp)
                     time.sleep(1)
+                else:
+                    pass
 
         except Exception as e:
             print('end'+ e)
 
     def add(self,fun, args=(),*, timeout=120, endtime=None):
         temp = threading.Thread(target=fun, args=args)
-        # result = self.threads
+        result = self.threads
         now = datetime.now()
-        self.threads.index(0, {
+        self.threads = [{
             'endTime': endtime or datetime.fromtimestamp(now.timestamp() + timeout),
             'thread': temp
-        })
-        # self.threads.extend(result)
+        }]
+        self.threads.extend(result)
 
     def run(self):
         if self.active is True:
@@ -65,7 +68,10 @@ class ThreadManage:
                     break
 
         temp = threading.Thread(target=do)
-        temp.run()
+        temp.start()
+        # temp.join()
+        time.sleep(10)
+        print('start1')
         self.active = False
 
 

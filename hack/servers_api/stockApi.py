@@ -22,8 +22,11 @@ class StockApi(ServersApi):
                     'order': data.get('order')
                 }).sort
                 query = {}
-                lis = fund.find(query).sort(sort).limit(page.get("pageSize")).skip(
-                    page.get("pageSize") * (page.get("current") - 1))
+                if page.get('current') == -1:
+                    lis = fund.find(query).sort(sort)
+                else:
+                    lis = fund.find(query).sort(sort).limit(page.get("pageSize")).skip(
+                        page.get("pageSize") * (page.get("current") - 1))
                 lis = list(lis)
                 for i in lis:
                     print(i['time'], i['time'].timestamp())
