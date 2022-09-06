@@ -179,6 +179,7 @@ class Stock_data:
         myMongo = mongodb_connect()
         self.mydb = myMongo['dongfangcaifu']
         self.startDate = startDate
+        self.projection = self.get_projection()
         self.data = pd.DataFrame()
         self.threadManage = ThreadManage()
         if code != '':
@@ -198,6 +199,18 @@ class Stock_data:
             self.threadManage.run()
             self.threadManage.waiter()
 
+    # 要查询的字段
+    def get_projection(self):
+        keys = ['time', 'f11', 'f12', 'f13', 'f15', 'f17', 'f19', 'f31', 'f33', 'f35', 'f37', 'f39', 'f43', 'f44', 'f45',
+               'f46', 'f47', 'f48', 'f49', 'f50','f52', 'f60', 'f71', 'f135', 'f136', 'f137', 'f138', 'f139', 'f141', 'f142', 'f144', 'f145',
+               'f147', 'f148', 'f161', 'f168', 'f169', 'f170']
+        projection = {
+            '_id': 0
+        }
+        for key in keys:
+            projection[key] = 1
+        return projection
+    
     def last_data(self, code):
         try:
             raw_dataset = pd.read_csv('../data/{}.csv'.format(code))
@@ -219,45 +232,49 @@ class Stock_data:
             print(e, code)
         return pd.DataFrame([])
 
+    # 过滤不连续的数据
     def filter_data(self, data):
         result = []
         for i in range(len(data)-1):
-            if data[i+1]['time'] - data[i]['time'] <= 180:
+            diff = data[i+1]['time'] - data[i]['time']
+            if diff <= 180:
                 data[i]['next_avg'] = data[i+1]['f43']
+                data[i]['target_diff_time'] = diff
                 result.append(data[i])
         return result
 
+    def should_remove(item):
+        for i in item:
+            # print(type(item[i]))
+            if item[i] == 0:
+                return  True
+            if type(item[i]) is not int and type(item[i]) is not float:
+                return True
+        return False
+    # 转换数据
+    def formate_data(self, res):
+        startYear = datetime(year=2020, month=1, day=1)
+        res['time'] = (res['time'].timestamp() - startYear.timestamp()) * 1000
+            # 当天交易时间9：30 = 0， 15：00 = 5.5*60*60, 减8是因为时间格式
+        res['c_time'] = res['time'] % (24 * 60 * 60 * 1000) - (9.5 - 8) * 60 * 60 * 1000
+        if self.should_remove(res) is False:
+            return res
+        return None
+
     def get_data(self, code, startDate=None):
-        keys = ['time', 'f11', 'f12', 'f13', 'f15', 'f17', 'f19', 'f31', 'f33', 'f35', 'f37', 'f39', 'f43', 'f44', 'f45',
-               'f46', 'f47', 'f48', 'f49', 'f50','f52', 'f60', 'f71', 'f135', 'f136', 'f137', 'f138', 'f139', 'f141', 'f142', 'f144', 'f145',
-               'f147', 'f148', 'f161', 'f168', 'f169', 'f170']
+        
         query = {}
         data = []
         if startDate:
             query['time'] = {"$gte": startDate}
         sort = [("time", -1)]
-        projection = {
-            '_id': 0
-        }
-        for key in keys:
-            projection[key] = 1
-        result = self.mydb[code].find(query, projection).sort(sort)
+        result = self.mydb[code].find(query, self.projection).sort(sort)
         result = list(result)
-        startYear = datetime(year=2020, month=1, day=1)
-        def should_remove(item):
-            for i in item:
-                # print(type(item[i]))
-                if item[i] == 0:
-                    return  True
-                if type(item[i]) is not int and type(item[i]) is not float:
-                    return True
-            return False
         for res in result:
-            res['time'] = (res['time'].timestamp() - startYear.timestamp()) * 1000
-            # 当天交易时间9：30 = 0， 15：00 = 5.5*60*60, 减8是因为时间格式
-            res['c_time'] = res['time'] % (24 * 60 * 60 * 1000) - (9.5 - 8) * 60 * 60 * 1000
-            if should_remove(res) is False:
+            res = self.formate_data(res)
+            if res is not None:
                 data.append(res)
+                
         return self.filter_data(data)
 
 # 以前的main方法
@@ -402,13 +419,38 @@ def test_spft(path='saved_model/my_model', code=''):
     print(loss)
     print(mae)
     print(mse)
-    model.save(path+'_'+code)
+    save_path = path
+    if code == '':
+        save_path += "_all" 
+    else:
+        save_path += '_'+code
+    model.save(save_path)
     # plot_history(history)
     test_predictions = model.predict(normed_test_data).flatten()
     print(test_labels[:10])
     print(test_predictions[:10])
 
     pass
+
+#  进行预测， 
+def predict(code='', stock_datas=[]):
+    data = []
+    for data_ in stock_datas:
+        data_['target_diff_time'] = 3*60
+        data_ = Stock_data.filter_data(data_)
+        if data_ != None:
+            data.append(data_)
+    path = 'saved_model/my_model'
+    model_path = path
+    if code == '':
+        model_path += "_all" 
+    else:
+        model_path += '_'+code
+    model = tf.keras.models.load_model(model_path)
+    test_predictions = model.predict(data).flatten()
+    return test_predictions
+
+
 if __name__ == '__main__':
     test_spft()
     # print(type())
