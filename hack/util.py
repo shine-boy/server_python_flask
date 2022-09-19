@@ -53,17 +53,18 @@ def mongodb_connect():
     mongo_ip = ['101.35.44.243', '127.0.0.1']
     root = 'myUserAdmin'
     password = 'abc123'
-    # myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[0]))
-    try:
-        env_ = sys.argv[1]
-        if env_ == 'SERVER':
-            print('connect:', env_)
-            myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[0]))
-        else:
-            myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
-    except Exception as e:
-        myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
-    print(myclient['dongfangcaifu'])
+    # systemctl restart mongod
+    myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[0]))
+    # try:
+    #     env_ = sys.argv[1]
+    #     if env_ == 'SERVER':
+    #         print('connect:', env_)
+    #         myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[0]))
+    #     else:
+    #         myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+    # except Exception as e:
+    #     myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
+    # print(myclient['dongfangcaifu'])
     return myclient
 
 def build_date(now=datetime.datetime.now(), add_month=0, add_day=0):

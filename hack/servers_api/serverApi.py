@@ -1,6 +1,7 @@
 # coding=utf-8
 from flask import Response, Flask, request
 from flask_cors import CORS
+import os
 import json
 from hack.include import Page, Sort
 from hack.util import mongodb_connect
@@ -36,6 +37,12 @@ class ServersApi(Request):
     def re_connect(self):
         if datetime.datetime.now() - self.lastConnectTime > 10*1000*60:
             self.myclient = mongodb_connect()
+            try:
+                if self.myclient.database_names():
+                    self.lastConnectTime = datetime.datetime.now()
+            except Exception:
+                os.system("systemctl restart mongod")
+                pass
 
     def register(self, url, methods=['get']):
         def do(func):
