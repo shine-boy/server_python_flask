@@ -4,6 +4,7 @@ import datetime
 from hack.util import isNull
 from hack.include.threadManage import threadManage
 from hack.stock import Statistic
+from hack.tensflow.soft import StockSoft
 class StockApi(ServersApi):
 
     def __init__(self, app):
@@ -22,6 +23,8 @@ class StockApi(ServersApi):
                     'order': data.get('order')
                 }).sort
                 query = {}
+                if data.get('startTime'):
+                    query['time'] = {"$gt": data.get('startTime')}
                 if page.get('current') == -1:
                     lis = fund.find(query).sort(sort)
                 else:
@@ -29,12 +32,50 @@ class StockApi(ServersApi):
                         page.get("pageSize") * (page.get("current") - 1))
                 lis = list(lis)
                 for i in lis:
-                    print(i['time'], i['time'].timestamp())
                     i['time'] = i['time'].timestamp() * 1000
                     i['_id'] = str(i['_id'])
                 result = {
                     'data': lis,
                     'total': fund.count_documents(filter=query)
+                }
+                return result
+            else:
+                return '未查询到数据'
+
+        # 根据股票编号预测-+对应股票数据
+        @self.register('/getcaculatestock', methods=['POST', 'GET'])
+        def getcaculatestock(data):
+            if data.get('code'):
+                code = data.get('code')
+                fund = self.myclient['dongfangcaifu'].get_collection(code)
+                sort = self.Sort().sort
+                query = {}
+                end = fund.find(query).sort(sort).limit(1)
+                end = list(end).pop()
+                start_time = end['time'].timestamp() + 3*60
+                if data.get('startTime'):
+                    start_time = data.get('startTime')
+                now = datetime.datetime.now()
+                end_time = datetime.datetime(year= now.year, month=now.month, day=now.day, hour=15).timestamp()
+                lis = []
+                while start_time < end_time:
+                    temp = end.copy()
+                    start_time += 3*60
+                    yu = start_time%24*60*60
+                    if yu < 9.5*60*60 or (yu > 11.5*60*60 and yu < 13*60*60) or yu > 15*30*30:
+                        continue
+                    temp['target_diff_time'] = 3*60
+                    temp['time'] = datetime.datetime.fromtimestamp(start_time)
+                    lis.append(temp)
+                stockSoft = StockSoft()
+                pres = stockSoft.predict(code, lis)
+                for i in range(list(lis)):
+                    lis[i]['time'] = lis[i]['time'].timestamp() * 1000
+                    lis[i]['_id'] = str(lis[i]['_id'])
+                    lis[i]['f43'] = pres[i]
+                result = {
+                    'data': lis,
+                    'total': len(lis)
                 }
                 return result
             else:
@@ -105,9 +146,10 @@ class StockApi(ServersApi):
 
 
 if __name__ == '__main__':
-    now = datetime.datetime.now()
-    cur = datetime.datetime(year=now.year, month=now.month, day=now.day - 1)
-
-    print('价值', '涨幅')
-    print(datetime.datetime(year=now.year, month=12, day=1))
+    print(12%10)
+    # now = datetime.datetime.now()
+    # cur = datetime.datetime(year=now.year, month=now.month, day=now.day - 1)
+    #
+    # print('价值', '涨幅')
+    # print(datetime.datetime(year=now.year, month=12, day=1))
 

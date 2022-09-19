@@ -41,6 +41,7 @@ class ServersApi(Request):
                 if self.myclient.database_names():
                     self.lastConnectTime = datetime.datetime.now()
             except Exception:
+                print('reconnect')
                 os.system("systemctl restart mongod")
                 pass
 

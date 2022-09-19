@@ -233,16 +233,19 @@ class Stock_data:
         return pd.DataFrame([])
 
     # 过滤不连续的数据
-    def filter_data(self, data):
+    @staticmethod
+    def filter_data(data):
         result = []
+        print(len(data))
         for i in range(len(data)-1):
-            diff = data[i+1]['time'] - data[i]['time']
-            if diff <= 180:
+            diff = data[i+1]['time'].timestamp() - data[i]['time'].timestamp()
+            if diff <= 3*60 and Stock_data.formate_data(data[i]) is not None:
                 data[i]['next_avg'] = data[i+1]['f43']
                 data[i]['target_diff_time'] = diff
                 result.append(data[i])
         return result
 
+    @staticmethod
     def should_remove(item):
         for i in item:
             # print(type(item[i]))
@@ -252,30 +255,25 @@ class Stock_data:
                 return True
         return False
     # 转换数据
-    def formate_data(self, res):
+    @staticmethod
+    def formate_data(res):
         startYear = datetime(year=2020, month=1, day=1)
         res['time'] = (res['time'].timestamp() - startYear.timestamp()) * 1000
             # 当天交易时间9：30 = 0， 15：00 = 5.5*60*60, 减8是因为时间格式
         res['c_time'] = res['time'] % (24 * 60 * 60 * 1000) - (9.5 - 8) * 60 * 60 * 1000
-        if self.should_remove(res) is False:
+        if Stock_data.should_remove(res) is False:
             return res
         return None
 
     def get_data(self, code, startDate=None):
         
         query = {}
-        data = []
         if startDate:
             query['time'] = {"$gte": startDate}
-        sort = [("time", -1)]
+        sort = [("time", 1)]
         result = self.mydb[code].find(query, self.projection).sort(sort)
         result = list(result)
-        for res in result:
-            res = self.formate_data(res)
-            if res is not None:
-                data.append(res)
-                
-        return self.filter_data(data)
+        return self.filter_data(result)
 
 # 以前的main方法
 def pre_main():
@@ -356,103 +354,113 @@ def pre_main():
 
     pass
 
-def test_spft(path='saved_model/my_model', code=''):
 
-    stockdata = Stock_data(code)
-    print(len(stockdata.data))
-    raw_dataset = stockdata.data
-    dataset = raw_dataset.copy()
-    dataset = dataset.dropna()
-    print(dataset.size)
-    train_dataset = dataset.sample(frac=0.8, random_state=0)
-    test_dataset = dataset.drop(train_dataset.index)
+class StockSoft:
+    def __init__(self):
+        pass
 
-    # 被目标值的定义卡住，目标值应该是之后哪个时间的成交价， 如果‘之后’这个时间固定的话又固定为什么
-    train_labels = train_dataset.pop('next_avg')
-    test_labels = test_dataset.pop('next_avg')
+    def test_spft(self, code='', path='saved_model/my_model'):
 
-    train_dataset = train_dataset.astype('float64', errors='ignore')
-    test_dataset = test_dataset.astype('float64', errors='ignore')
-    train_stats = train_dataset.describe()
-    # 转置
-    train_stats = train_stats.transpose()
-    print(train_stats)
-    # print(train_dataset.keys())
+        stockdata = Stock_data(code)
+        print(len(stockdata.data))
+        raw_dataset = stockdata.data
+        dataset = raw_dataset.copy()
+        dataset = dataset.dropna()
+        print(dataset.size)
+        train_dataset = dataset.sample(frac=0.8, random_state=0)
+        test_dataset = dataset.drop(train_dataset.index)
 
-    # 数据规范化，归一化
-    def norm(x):
-        return (x - train_stats['mean']) / train_stats['std']
+        # 被目标值的定义卡住，目标值应该是之后哪个时间的成交价， 如果‘之后’这个时间固定的话又固定为什么
+        train_labels = train_dataset.pop('next_avg')
+        test_labels = test_dataset.pop('next_avg')
 
-    # 股票数据不适用归一化
-    normed_train_data = norm(train_dataset)
-    normed_test_data = norm(test_dataset)
+        train_dataset = train_dataset.astype('float64', errors='ignore')
+        test_dataset = test_dataset.astype('float64', errors='ignore')
+        train_stats = train_dataset.describe()
+        # 转置
+        train_stats = train_stats.transpose()
+        print(train_stats)
 
-    model = build_model(len(train_dataset.keys()))
-    model.summary()
+        # print(train_dataset.keys())
 
-    early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
+        # 数据规范化，归一化
+        def norm(x):
+            return (x - train_stats['mean']) / train_stats['std']
 
-    checkpoint_path = "training/cp.ckpt"
-    checkpoint_dir = os.path.dirname(checkpoint_path)
-    print('file')
-    print(checkpoint_dir)
-    # 创建一个保存模型权重的回调
-    cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
-                                                     save_weights_only=True,
-                                                     verbose=1)
-    train_labels = train_labels.astype('float64', errors='ignore')
-    test_labels = test_labels.astype('float64', errors='ignore')
-    log_path = "logs/fit/"
-    if code!= '':
-        log_path += code + '/'
-    log_dir = log_path + datetime.now().strftime("%Y%m%d-%H%M%S")
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+        # 股票数据不适用归一化
+        normed_train_data = norm(train_dataset)
+        normed_test_data = norm(test_dataset)
 
-    history = model.fit(
-        normed_train_data, train_labels,
-        epochs=1000,
-        validation_split=0.2, verbose=0,
-        validation_data=(test_dataset, test_labels),
-        callbacks=[cp_callback, early_stop, tensorboard_callback])
+        model = build_model(len(train_dataset.keys()))
+        model.summary()
 
-    loss, mae, mse = model.evaluate(normed_test_data, test_labels, verbose=2)
-    print(loss)
-    print(mae)
-    print(mse)
-    save_path = path
-    if code == '':
-        save_path += "_all" 
-    else:
-        save_path += '_'+code
-    model.save(save_path)
-    # plot_history(history)
-    test_predictions = model.predict(normed_test_data).flatten()
-    print(test_labels[:10])
-    print(test_predictions[:10])
+        early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=10)
 
-    pass
+        checkpoint_path = "training/cp.ckpt"
+        checkpoint_dir = os.path.dirname(checkpoint_path)
+        print('file')
+        print(checkpoint_dir)
+        # 创建一个保存模型权重的回调
+        cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                         save_weights_only=True,
+                                                         verbose=1)
+        train_labels = train_labels.astype('float64', errors='ignore')
+        test_labels = test_labels.astype('float64', errors='ignore')
+        log_path = "logs/fit/"
+        if code != '':
+            log_path += code + '/'
+        log_dir = log_path + datetime.now().strftime("%Y%m%d-%H%M%S")
+        tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-#  进行预测， 
-def predict(code='', stock_datas=[]):
-    data = []
-    for data_ in stock_datas:
-        data_['target_diff_time'] = 3*60
-        data_ = Stock_data.filter_data(data_)
-        if data_ != None:
-            data.append(data_)
-    path = 'saved_model/my_model'
-    model_path = path
-    if code == '':
-        model_path += "_all" 
-    else:
-        model_path += '_'+code
-    model = tf.keras.models.load_model(model_path)
-    test_predictions = model.predict(data).flatten()
-    return test_predictions
+        history = model.fit(
+            normed_train_data, train_labels,
+            epochs=1000,
+            validation_split=0.2, verbose=0,
+            validation_data=(test_dataset, test_labels),
+            callbacks=[cp_callback, early_stop, tensorboard_callback])
+
+        loss, mae, mse = model.evaluate(normed_test_data, test_labels, verbose=2)
+        print(loss)
+        print(mae)
+        print(mse)
+        save_path = path
+        if code == '':
+            save_path += "_all"
+        else:
+            save_path += '_' + code
+        model.save(save_path)
+        # plot_history(history)
+        test_predictions = model.predict(normed_test_data).flatten()
+        print(test_labels[:10])
+        print(test_predictions[:10])
+
+        pass
+
+    #  进行预测，
+    def predict(self, code='', stock_datas=[]):
+        data = Stock_data.filter_data(stock_datas)
+        # for data_ in stock_datas:
+        #     data_['target_diff_time'] = 3 * 60
+        #     data_ = Stock_data.filter_data(data_)
+        #     if data_ != None:
+        #         data.append(data_)
+        path = 'saved_model/my_model'
+        model_path = path
+        if code == '':
+            model_path += "_all"
+        else:
+            model_path += '_' + code
+        if os.path.exists(model_path) is False:
+            print('start soft')
+            self.test_spft(code)
+        model = tf.keras.models.load_model(model_path)
+        test_predictions = model.predict(data).flatten()
+        return test_predictions
 
 
 if __name__ == '__main__':
-    test_spft()
+    stockSoft = StockSoft()
+    stockSoft.test_spft()
     # print(type())
     # stockdata= Stock_data('000002')
     # print(stockdata.data)
