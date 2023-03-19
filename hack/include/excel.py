@@ -190,15 +190,14 @@ def fileToBBytes(file):
 
 
 # 消化内科数据
-def consume(defaultName,defaultHead,defaultFilter, file = None):
+def consume(defaultName=None,defaultHead=None,defaultFilter=None, file = None):
     # filename = 'C:\\Users\wu\Desktop\\servers_api.xlsx';
     filename = 'C:\\Users\wu\Documents\WeChat Files\wxid_iu41h1yc1i9422\FileStorage\File\\2021-11\消化内科数据.xlsx'
 
     if file:
         filename = fileToBBytes(file)
-
-    book = xlrd.open_workbook(filename, file_contents=filename)
-
+    print(filename)
+    book = xlrd.open_workbook(filename)
     # 筛选
     def filter(head, data):
         for i in range(len(data[0])):
@@ -253,7 +252,6 @@ def consume(defaultName,defaultHead,defaultFilter, file = None):
                 # print(head)
                 # print(data[i])
                 # print(data[i][head['column']])
-
 
     # 递归 header规则
     def find(head, column):
@@ -838,10 +836,11 @@ def consume(defaultName,defaultHead,defaultFilter, file = None):
 def jibing(file=None, filter=None, head=None):
     filter_ = [
         {
-            'title': '小于39',
+            'title': '7-17',
             'source': '年龄',
             'column': -1,
-            'max': 39,
+            'max': 17,
+            'min': 7,
             'filter': [
                 {
                     'source': '性别',
@@ -866,11 +865,11 @@ def jibing(file=None, filter=None, head=None):
             'rows': [],
         },
         {
-            'title': '40-59',
+            'title': '18-40',
             'source': '年龄',
             'column': -1,
-            'max': 59,
-            'min': 40,
+            'max': 40,
+            'min': 18,
             'filter': [
                 {
                     'source': '性别',
@@ -895,11 +894,11 @@ def jibing(file=None, filter=None, head=None):
             'rows': [],
         },
         {
-            'title': '60-79',
+            'title': '41-65',
             'source': '年龄',
             'column': -1,
-            'max': 79,
-            'min': 60,
+            'max': 65,
+            'min': 41,
             'filter': [
                 {
                     'source': '性别',
@@ -924,10 +923,10 @@ def jibing(file=None, filter=None, head=None):
             'rows': [],
         },
         {
-            'title': '大于80',
+            'title': '大于66',
             'source': '年龄',
             'column': -1,
-            'min': 80,
+            'min': 66,
             'filter': [
                 {
                     'source': '性别',
@@ -1610,8 +1609,10 @@ def waike(file=None, filter=None, head=None):
     }
     return consume(defaultName='外科诊室', defaultHead=head or header,defaultFilter=filter or filter_, file=file);
 
+
 if __name__ == '__main__':
-   consume()
+   # consume()
+   jibing()
    a = []
    a.append(3)
    print(a)
