@@ -4,7 +4,7 @@ import datetime
 from hack.util import isNull
 from hack.include.threadManage import threadManage
 from hack.stock import Statistic
-from hack.tensflow.soft import StockSoft
+# from hack.tensflow.soft import StockSoft
 class StockApi(ServersApi):
 
     def __init__(self, app):
@@ -67,12 +67,12 @@ class StockApi(ServersApi):
                     temp['target_diff_time'] = 3*60
                     temp['time'] = datetime.datetime.fromtimestamp(start_time)
                     lis.append(temp)
-                stockSoft = StockSoft()
-                pres = stockSoft.predict(code, lis)
+                # stockSoft = StockSoft()
+                # pres = stockSoft.predict(code, lis)
                 for i in range(list(lis)):
                     lis[i]['time'] = lis[i]['time'].timestamp() * 1000
                     lis[i]['_id'] = str(lis[i]['_id'])
-                    lis[i]['f43'] = pres[i]
+                    # lis[i]['f43'] = pres[i]
                 result = {
                     'data': lis,
                     'total': len(lis)
