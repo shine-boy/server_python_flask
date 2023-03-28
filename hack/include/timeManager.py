@@ -16,7 +16,11 @@ class TimeManager:
         del args['type']
         @self.sched.scheduled_job(type, **args, id=name)
         def do_func():
-            func()
+            try:
+                func()
+            except Exception as e:
+                print('执行队列',e)
+                pass
             pass
         # threading.Thread(target=do_func).start()
         pass
