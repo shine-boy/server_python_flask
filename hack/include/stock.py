@@ -214,7 +214,7 @@ class Stock:
     def waiter(self):
         self.threadManage.waiter()
         
-    def insert_mongo(self,code):
+    def insert_mongo(self,code,test=False):
         current = datetime.now()
         doc=self.marketAnalysis(code,current)
         doc = util.getKeys_dic(doc, self.stock_describe.keys())
@@ -223,6 +223,9 @@ class Stock:
             names = self.mydb['names']
             if names.find_one({'code': doc['f57']}) is None:
                 names.insert_one({'code': doc['f57'], 'name': doc['f58']})
+            if test:
+                print(doc)
+                return
             colloction=self.mydb[doc['f57']]
             colloction.insert_one(doc)
 
@@ -273,9 +276,9 @@ if __name__ == '__main__':
     #
     # print()
     print(stock.stocks)
-    # stock.insert_mongo('002038')
-    stock.do(stock.insert_mongo)
-    stock.waiter()
+    stock.insert_mongo('002038', test=True)
+    # stock.do(stock.insert_mongo)
+    # stock.waiter()
     print(time.time()-ti)
     # te = os.system('netstat -nap')
 

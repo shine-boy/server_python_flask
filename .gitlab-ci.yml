@@ -17,7 +17,8 @@ install:
   stage: install
   script:
     - sudo -i & cd $CI_PROJECT_DIR
-#    - & pipenv install --skip-lock
+    - pipenv update chinesecalendar
+    - & pipenv install --skip-lock
   allow_failure: true
 
 
