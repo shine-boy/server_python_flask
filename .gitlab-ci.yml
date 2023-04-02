@@ -17,7 +17,7 @@ install:
   stage: install
   script:
     - sudo -i & cd $CI_PROJECT_DIR
-    - pip install -U chinesecalendar
+    - pip3 install -U chinesecalendar
 #    - pipenv shell
 #    - pipenv update chinesecalendar
 #    - pipenv install --skip-lock
