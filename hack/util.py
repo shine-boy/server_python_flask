@@ -54,7 +54,8 @@ def mongodb_connect():
     root = 'myUserAdmin'
     password = 'abc123'
     # systemctl restart mongod
-    myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[0]))
+    # myclient = pymongo.MongoClient("mongodb://{}:{}@{}:27017/".format(root, password, mongo_ip[1]))
+    myclient = pymongo.MongoClient("mongodb://127.0.0.1:27017/")
     # try:
     #     env_ = sys.argv[1]
     #     if env_ == 'SERVER':
@@ -68,6 +69,9 @@ def mongodb_connect():
     return myclient
 
 def build_date(now=datetime.datetime.now(), add_month=0, add_day=0):
+    print(type(now))
+    if isinstance(now, str):
+        now = datetime.strptime(now, '%Y-%m-%d')
     month = now.month + add_month
     year_ = int(month/12)
     month = month%12
@@ -81,5 +85,5 @@ def build_date(now=datetime.datetime.now(), add_month=0, add_day=0):
 
 if __name__ == '__main__':
     print(sys.argv)
-    mongodb_connect()
+    # mongodb_connect()
     print(build_date(add_day=30))

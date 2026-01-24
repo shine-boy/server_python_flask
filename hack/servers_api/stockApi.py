@@ -4,6 +4,7 @@ import datetime
 from hack.util import isNull
 from hack.include.threadManage import threadManage
 from hack.stock import Statistic
+from hack.stock import Stock
 # from hack.tensflow.soft import StockSoft
 class StockApi(ServersApi):
 
@@ -11,6 +12,7 @@ class StockApi(ServersApi):
         ServersApi.__init__(self, app)
         self.threadManage = threadManage
         self.statistic = Statistic(self.myclient)
+        self.stock = Stock()
         # 根据股票编号查询对应股票数据
         @self.register('/getstock', methods=['POST', 'GET'])
         def getstock(data):
@@ -23,8 +25,8 @@ class StockApi(ServersApi):
                     'order': data.get('order')
                 }).sort
                 query = {}
-                if data.get('startTime'):
-                    query['time'] = {"$gt": data.get('startTime')}
+                if data.get('date'):
+                    query['date'] = {"$gt": data.get('date')}
                 if page.get('current') == -1:
                     lis = fund.find(query).sort(sort)
                 else:
@@ -32,7 +34,7 @@ class StockApi(ServersApi):
                         page.get("pageSize") * (page.get("current") - 1))
                 lis = list(lis)
                 for i in lis:
-                    i['time'] = i['time'].timestamp() * 1000
+                    # i['time'] = i['time'].timestamp() * 1000
                     i['_id'] = str(i['_id'])
                 result = {
                     'data': lis,
@@ -52,9 +54,10 @@ class StockApi(ServersApi):
                 query = {}
                 end = fund.find(query).sort(sort).limit(1)
                 end = list(end).pop()
-                start_time = end['time'].timestamp() + 3*60
-                if data.get('startTime'):
-                    start_time = data.get('startTime')
+
+                start_time = datetime.datetime.strptime(end['date'], '%Y-%m-%d').timestamp() + 3*60
+                if data.get('date'):
+                    start_time = data.get('date')
                 now = datetime.datetime.now()
                 end_time = datetime.datetime(year= now.year, month=now.month, day=now.day, hour=15).timestamp()
                 lis = []
@@ -70,7 +73,7 @@ class StockApi(ServersApi):
                 # stockSoft = StockSoft()
                 # pres = stockSoft.predict(code, lis)
                 for i in range(list(lis)):
-                    lis[i]['time'] = lis[i]['time'].timestamp() * 1000
+                    # lis[i]['time'] = lis[i]['time'].timestamp() * 1000
                     lis[i]['_id'] = str(lis[i]['_id'])
                     # lis[i]['f43'] = pres[i]
                 result = {
@@ -123,13 +126,13 @@ class StockApi(ServersApi):
             }).sort
             query = {}
             if isNull(data.get("search")) is False:
-                query['$or'] = [{ "f57": {'$regex': ".*" + data.get("search") + ".*"}}, { "f58": {'$regex': ".*" + data.get("search") + ".*"}}]
+                query['$or'] = [{ "code": {'$regex': ".*" + data.get("search") + ".*"}}, { "name": {'$regex': ".*" + data.get("search") + ".*"}}]
             totalDB = self.myclient['stock_statistic']['totalDB']
             lis = totalDB.find(query).sort(sort).limit(page.get("pageSize")).skip(
                 page.get("pageSize") * (page.get("current") - 1))
             lis = list(lis)
             for i in lis:
-                i['time'] = i['time'].timestamp() * 1000
+                # i['time'] = i['time'].timestamp() * 1000
                 i['_id'] = str(i['_id'])
             result = {
                 'data': lis or [],
@@ -143,6 +146,14 @@ class StockApi(ServersApi):
             limit = data.get('limit') or 10
             day_limit = data.get('days') or 7
             return self.statistic.near_day(limit, day_limit, ['f43', 'f170'])
+
+        # 同步所以股票数据至数据库
+        @self.register('/updateStock', methods=['GET'])
+        def update_stock(data):
+            self.threadManage.add(self.stock.upDateAllStock).run()
+            return self.stock.getProgress()
+
+
 
 
 if __name__ == '__main__':

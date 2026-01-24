@@ -2,7 +2,6 @@
 from hack.servers_api.serverApi import ServersApi
 import datetime
 
-import hack.include.excel as myExcel
 from hack.util import isNull
 from hack.include.threadManage import threadManage
 
@@ -59,16 +58,3 @@ class OtherApi(ServersApi):
             }
             return result
 
-        @self.register('/uploadProjectExel', methods=['POST', 'GET'])
-        def uploadProjectExel(data, my_file):
-            try:
-                data = data['form']
-
-                if data and data.get('type') == '1':
-                    resfile = myExcel.jibing(my_file, head=data.get('header'), filter=data.get('filter'))
-                else:
-                    resfile = myExcel.waike(my_file, head=data.get('header'), filter=data.get('filter'))
-            except Exception as e:
-                pass
-
-            return resfile

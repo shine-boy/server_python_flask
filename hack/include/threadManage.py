@@ -38,9 +38,10 @@ class ThreadManage:
         now = datetime.now()
         self.threads = [{
             'endTime': endtime or datetime.fromtimestamp(now.timestamp() + timeout),
-            'thread': temp
+            'thread': temp,
         }]
         self.threads.extend(result)
+        return  self
 
     def run(self):
         if self.active is True:
@@ -51,9 +52,9 @@ class ThreadManage:
                     obj = self.threads.pop()
                     temp = obj.get('thread')
                     now = datetime.now()
-                    if obj.get('endTime') < now:
-                        continue
                     activeCount = threading.activeCount()
+                    if activeCount == 0 and obj.get('endTime') < now:
+                        continue
                     if activeCount <= self.threadingNum:
                         temp.start()
                         self.running.append(temp)

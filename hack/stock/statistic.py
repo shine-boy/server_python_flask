@@ -29,14 +29,14 @@ class Statistic:
         sort = [("time", -1)]
 
         def get_stock_short(i):
-            current_time = shorts[i].get('time')
+            current_time = shorts[i].get('date')
             next_time = build_date(current_time, add_day=1)
             names = shorts[i].get('short') or []
             print(names)
             totalDB = self.mongoClient['stock_statistic']['totalDB']
             for name in names:
                 stockDB = self.mongoClient['dongfangcaifu'].get_collection(name)
-                data = stockDB.find({"time": {"$gte": current_time, "$lt": next_time}}).sort(sort).limit(1)
+                data = stockDB.find({"date": {"$gte": current_time, "$lt": next_time}}).sort(sort).limit(1)
                 data = list(data)
                 if len(data) > 0:
                     data = data[0]
@@ -83,7 +83,7 @@ class Statistic:
                 print(cur, temp_time)
                 exit = False
                 for short in shorts:
-                    short_time = short.get('time')
+                    short_time = short.get('date')
                     print(short_time)
                     if short_time >= cur and short_time < temp_time:
                         exit = True
@@ -98,11 +98,11 @@ class Statistic:
         temp_time = build_date(now, add_day=1 - limit_day)
         # 删除超过需要汇总时间的数据
         shortDB.delete_many({
-            "time": {"$lt": temp_time}
+            "date": {"$lt": temp_time}
         })
         # 表明有数据过期，需对应删除汇总表数据
         totalDB.delete_many({
-            "time": {"$lt": temp_time}
+            "date": {"$lt": temp_time}
         })
 
         # 计算哪些天的数据需要新汇总
@@ -118,11 +118,11 @@ class Statistic:
         # 汇总
         def summary(days):
             print(days)
-            sort = [("time", -1)]
+            sort = [("date", -1)]
             short_data = []
             for current_time in days:
                 short_data.append({
-                    "time": current_time,
+                    "date": current_time,
                     "short": []
                 })
 
@@ -136,7 +136,7 @@ class Statistic:
                     current_time = days[i]
 
                     next_time = build_date(current_time, add_day=1)
-                    data = stockDB.find({"time": {"$gte": current_time, "$lt": next_time}}).sort(sort).limit(1)
+                    data = stockDB.find({"date": {"$gte": current_time, "$lt": next_time}}).sort(sort).limit(1)
                     data = list(data)
                     if len(data) > 0:
                         data = data[0]
@@ -145,7 +145,7 @@ class Statistic:
                     if data is None:
                         short_data[i].get('short').append(stock)
                     else:
-                        if totalDB.find_one({'time': data.get('time')}) is None:
+                        if totalDB.find_one({'date': data.get('date')}) is None:
                             totalDB.insert_one(data)
 
             for stock in stocks:
@@ -169,13 +169,13 @@ class Statistic:
         return list(fund.find())
 
     # 最近连续下降次数最多的10个
-    def near_day(self, limit=10, day_limit=10, attributes=["f43"]):
+    def near_day(self, limit=10, day_limit=10, attributes=["close"]):
         results = {}
         for attribute in attributes:
             results[attribute] = []
         names = self.getNames()
         db = self.mongoClient['dongfangcaifu']
-        sort = [("time", -1)]
+        sort = [("date", -1)]
         days = rili.stock_days(day_limit)
 
         for name in names:
@@ -197,7 +197,7 @@ class Statistic:
                 for cur in days:
                     try:
                         next_time = build_date(cur, add_day=1)
-                        data = db[code].find({"time": {"$gte": cur, "$lt": next_time}}).sort(sort).limit(1)
+                        data = db[code].find({"date": {"$gte": cur, "$lt": next_time}}).sort(sort).limit(1)
                         data = list(data)
                         if len(data) > 0:
                             data = data.pop()
@@ -250,11 +250,11 @@ class Statistic:
                 result = {
                     'min': 100000,
                     'max': 0,
-                    'time': current_time
+                    'date': current_time
                 }
                 next_time = build_date(current_time, add_day=1)
-                query = {"time": {"$gte": current_time, "$lt": next_time}}
-                sort = [("time", -1)]
+                query = {"date": {"$gte": current_time, "$lt": next_time}}
+                sort = [("date", -1)]
                 if day_db.find_one(query) is not None:
                     break
                 data = db.find(query).sort(sort)
@@ -264,10 +264,10 @@ class Statistic:
                         try:
                             if da.get(attibute) < result['min']:
                                 result['min'] = da.get(attibute)
-                                result['min_time'] = da.get('time')
+                                result['min_time'] = da.get('date')
                             if da.get(attibute) > result['max']:
                                 result['max'] = da.get(attibute)
-                                result['max_time'] = da.get('time')
+                                result['max_time'] = da.get('date')
                         except Exception as e:
                             self.journal.save(e)
                     day_db.insert_one(result)
@@ -287,11 +287,11 @@ class Statistic:
             result = {
                 'min': 100000,
                 'max': 0,
-                'time': current_time
+                'date': current_time
             }
             next_time = build_date(current_time, add_day=7)
-            query = {"time": {"$gte": current_time, "$lt": next_time}}
-            sort = [("time", -1)]
+            query = {"date": {"$gte": current_time, "$lt": next_time}}
+            sort = [("date", -1)]
             if week_db.find_one(query) is not None:
                 break
             data = db.find(query).sort(sort)
@@ -301,10 +301,10 @@ class Statistic:
                     try:
                         if da.get(attibute) < result['min']:
                             result['min'] = da.get(attibute)
-                            result['min_time'] = da.get('time')
+                            result['min_time'] = da.get('date')
                         if da.get(attibute) > result['max']:
                             result['max'] = da.get(attibute)
-                            result['max_time'] = da.get('time')
+                            result['max_time'] = da.get('date')
                     except Exception as e:
                         self.journal.save(e)
                 week_db.insert_one(result)
@@ -336,10 +336,10 @@ class Statistic:
                     try:
                         if da.get(attibute) < result['min']:
                             result['min'] = da.get(attibute)
-                            result['min_time'] = da.get('time')
+                            result['min_time'] = da.get('date')
                         if da.get(attibute) > result['max']:
                             result['max'] = da.get(attibute)
-                            result['max_time'] = da.get('time')
+                            result['max_time'] = da.get('date')
                     except Exception as e:
                         self.journal.save(e)
                 month_db.insert_one(result)

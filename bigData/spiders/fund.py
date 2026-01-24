@@ -4,7 +4,8 @@ import scrapy
 import time
 from urllib import parse
 from hack.util import mongodb_connect
-import demjson
+# import demjson
+demjson = {}
 class fund(scrapy.Spider):
     name = 'dfcf_fund'
 

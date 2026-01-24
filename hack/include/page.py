@@ -20,9 +20,9 @@ class Page:
 class Sort:
     def __init__(self, sort=None):
         if sort is None:
-            sort = [("time", -1)]
+            sort = [("date", -1)]
         else:
-            sortKey = sort.get('sort') or 'time'
+            sortKey = sort.get('sort') or 'date'
             order = sort.get('order') or -1
             ascend = ['ascend', 1]
             # descend = ['descend', -1]

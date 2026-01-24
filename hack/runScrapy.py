@@ -154,7 +154,7 @@ def doSched():
     sched.start()
 
 
-@app.before_first_request
+@app.before_request
 def before_first_request():
     pass
     # data={"cmd":"scrapy crawl wangyiyun"}
@@ -197,10 +197,10 @@ if __name__ == '__main__':
     # while True:
     #     schedule.run_pending()
     #     time.sleep(1)
-    port = 5000
+    port = 9988
     kill_port(port)
     time.sleep(3);
-    threading.Thread(target=doSched).start()
+    # threading.Thread(target=doSched).start()
     server = make_server('0.0.0.0', port, app)
     print('run: 0.0.0.0:' + str(port))
     server.serve_forever()
