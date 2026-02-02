@@ -65,9 +65,14 @@ class MyXtQuantTraderCallback(XtQuantTraderCallback):
         print(
             f'成交回报: 股票代码:{trade.stock_code} 账号:{trade.account_id}, 订单编号:{trade.order_id} 柜台合同编号:{trade.order_sysid} \
             成交编号:{trade.traded_id} 成交数量:{trade.traded_volume} 委托数量:{trade.direction} {datetime.fromtimestamp(trade.order_time)}')
+        time.sleep(2)
+        globalData['startBuy'] = True
         if trade.strategy_name == 'sell':
-            globalData['startBuy'] = True
             stockBuySell.codes.append(trade.stock_code)
+        if trade.strategy_name == 'buy':
+            data = stockCache.get(trade.stock_code)
+            if data is not None:
+                data.buyNum = trade.traded_volume
 
     def on_order_error(self, order_error):
         print(
@@ -87,7 +92,7 @@ class MyXtQuantTraderCallback(XtQuantTraderCallback):
 
 
 
-rootPath = 'http://localhost:3001'
+rootPath = 'http://localhost:3002'
 
 def fetchPost(url, params):
     headers = {
@@ -107,7 +112,8 @@ class CacheStock(object):
     code = None
     open_price = None
     poor = None
-
+    buyPrice = None
+    buyNum = None
     def __init__(self, code):
         self.code = code
         pass
@@ -145,18 +151,20 @@ class CacheStock(object):
                 max = temp
         self.poor = pow(10, -max) * 1
 
+
     def getBuyItem(self, info, hasInfo):
-        print('getBuyItemCode', self.code)
+        # print('getBuyItemCode', self.code)
+        now = datetime.now()
+        self.getLastData()
+        available_cash = info['available_cash']
+        self.buyItem = fetchPost('/drawServer/buyItem', {
+            'code': self.code.split('.')[0], 'date': now.strftime("%Y-%m-%d"), 'allValue': available_cash, 'hasInfo': hasInfo,
+            'startValue': self.open_price, 'has': hasInfo.get(self.code).get('has') if hasInfo.get(self.code) else 0
+        })
         if self.buyItem is None:
-            now = datetime.now()
-            self.getLastData()
-            available_cash = info['available_cash']
-            self.buyItem = fetchPost('/drawServer/buyItem', {
-                'code': self.code.split('.')[0], 'date': now.strftime("%Y-%m-%d"), 'allValue': available_cash,
-                'startValue': self.open_price, 'has': hasInfo.get(self.code).get('has') if hasInfo.get(self.code) else 0
-            })
-        if self.buyItem is None or self.buyItem.get('data') is None:
-            self.buyItem = None
+            stockBuySell.codes.append(self.code)
+            return None
+        if self.buyItem.get('data') is None:
             return None
         full_tick = self.getLastData()
         data = self.buyItem['data']
@@ -164,21 +172,21 @@ class CacheStock(object):
             stockBuySell.codes.append(self.code)
             return None
         if data.get('buyValue') is None:
+            stockBuySell.codes.append(self.code)
             return  None
-        if full_tick['lastPrice'] <= (data['buyValue'] + self.poor):
-                return self.buyItem
+        if full_tick['lastPrice'] <= (data['buyValue']):
+            return self.buyItem
         stockBuySell.codes.append(self.code)
         return None
 
     def getSellItem(self, info, hasInfo):
-        if self.sellItem is None:
-            now = datetime.now()
-            available_cash = info['available_cash']
-            self.getLastData()
-            self.sellItem = fetchPost('/drawServer/sellItem', {
-                'code': self.code.split('.')[0], 'date': now.strftime("%Y-%m-%d"), 'allValue': available_cash,
-                'startValue': self.open_price, 'has': hasInfo.get(self.code).get('has') if hasInfo.get(self.code) else 0
-            })
+        now = datetime.now()
+        available_cash = info['available_cash']
+        self.getLastData()
+        self.sellItem = fetchPost('/drawServer/sellItem', {
+            'code': self.code.split('.')[0], 'date': now.strftime("%Y-%m-%d"), 'allValue': available_cash,
+            'startValue': self.open_price, 'has': hasInfo.get(self.code).get('has') if hasInfo.get(self.code) else 0
+        })
         if self.sellItem is None or self.sellItem.get('data') is None:
             self.sellItem=None
             return None
@@ -186,7 +194,13 @@ class CacheStock(object):
         data = self.sellItem['data']
         if data.get('sellValue') is None:
             return None
-        if full_tick['lastPrice'] >= (data['sellValue'] - self.poor):
+
+        # 连续上涨则不着急卖出
+        # if self.buyItem:
+        #     buyData = self.buyItem['data']
+        #     if buyData.get('predictValue') < buyData.get('predictValue2') and self.buyNum is None:
+        #         return  None
+        if full_tick['lastPrice'] >= (data['sellValue']):
                 return self.sellItem
         return None
 
@@ -254,7 +268,7 @@ class StockBuySell:
     def getLastData(self,code):
         # 取全推数据
         full_tick = xtdata.get_full_tick([code])
-        print('全推数据 日线最新值', full_tick[code])
+        # print('全推数据 日线最新值', full_tick[code])
         return full_tick[code]
 
     def getInfo(self):
@@ -271,10 +285,12 @@ class StockBuySell:
         for i in positions:
             if hasInfo.get(i.stock_code) is None:
                 hasInfo[i.stock_code] = {}
-            hasInfo[i.stock_code]['has'] = i.m_nVolume
-            hasInfo[i.stock_code]['canSell'] = i.m_nCanUseVolume
+            hasInfo[i.stock_code]['has'] = i.volume
+            hasInfo[i.stock_code]['canSell'] = i.can_use_volume
+            hasInfo[i.stock_code]['value'] = i.market_value
 
-        print('账户信息',result, hasInfo)
+
+        # print('账户信息',result, hasInfo, len(hasInfo))
         return result,hasInfo
 
     def hasBuyDoing(self, stock_code):
@@ -295,7 +311,11 @@ class StockBuySell:
             if order.strategy_name == 'buy' and order.order_status == 50:
                 stockData = self.getStockData(order.stock_code)
                 if stockData.cancelSell_Buy():
-                    self.xt_trader.cancel_order_stock_async(self.xt_acc, order.order_id)
+                    flag = self.xt_trader.cancel_order_stock(self.xt_acc, order.order_id)
+                    print('撤单', flag)
+                    if flag == 0:
+                        stockBuySell.codes.append(order.stock_code)
+
 
             if order.strategy_name == 'sell' and order.order_status == 50:
                 return True
@@ -334,7 +354,6 @@ class StockBuySell:
                     continue
                 self.codes.append(code_)
 
-        print('codes',self.codes)
         globalData['startBuy'] = True
         # self.buyNext()
 
@@ -350,8 +369,10 @@ class StockBuySell:
         for i in range(len(self.codes)):
             try:
                 self.buy(self.codes.pop(0))
+
             except Exception as e:
                 print(e)
+        print(self.codes)
 
     def getStockData(self, code):
         stockData = None
@@ -377,6 +398,8 @@ class StockBuySell:
                 async_seq = self.xt_trader.order_stock_async(self.xt_acc, code, xtconstant.STOCK_BUY, data['buyNum'], xtconstant.FIX_PRICE,
                                                 buyValue,
                                                 'buy', code)
+            else:
+                self.codes.append(code)
 
 
     def doSell(self):
@@ -391,6 +414,7 @@ class StockBuySell:
                     print(e)
         pass
     def sell(self, code, info, hasInfo):
+
         stockData = self.getStockData(code)
         sellItem = stockData.getSellItem(info, hasInfo)
         if sellItem:
@@ -412,6 +436,7 @@ class StockBuySell:
             return False
         if now.strftime('%Y%m%d') == dataItem['timetag'].split(' ')[0]:
             return True
+        return False
 
     def cancel_order(self, code, info, order):
         orderItem = order.get(code)
@@ -435,19 +460,20 @@ class StockBuySell:
 
 
 def test():
-    data = xtdata.get_local_data ([], ['000816.SZ'], period='1m', count=10)
+    data = xtdata.get_sector_list()
+    # data = xtdata.get_local_data ([], ['000816.SZ'], period='1m', count=10)
     print(data)
 if __name__ == '__main__':
     # 迅投研 xtquant 示例
     now = datetime.now()
     stockBuySell = StockBuySell()
+    info, hasInfo = stockBuySell.getInfo()
+    stockBuySell.sell(stockBuySell.formateCode('600150'),info, hasInfo)
     globalData['stockBuySell'] = stockBuySell
-    stockBuySell.hasBuyDoing('')
+    # stockBuySell.hasBuyDoing('')
     startStr = ' 09:30:00'
     endStr = ' 15:00:00'
-
     # test()
-
     startDate = datetime.fromisoformat(now.strftime('%Y-%m-%d') + startStr)
     endDate = datetime.fromisoformat(now.strftime('%Y-%m-%d') + endStr)
     if startDate < now < endDate:
@@ -457,26 +483,27 @@ if __name__ == '__main__':
         now = datetime.now()
         startDate = datetime.fromisoformat(now.strftime('%Y-%m-%d') + startStr)
         endDate = datetime.fromisoformat(now.strftime('%Y-%m-%d') + endStr)
-        if endDate < now or now < startDate or [6].index(now.isoweekday()):
+        if now.strftime('%H:%M:%S') == startDate.strftime('%H:%M:%S'):
+            if stockBuySell.isTranding('000816'):
+                stockBuySell.startBuy()
+        if endDate < now or now < startDate or now.isoweekday() in [6,7]:
             stockBuySell.codes = []
             globalData['startBuy'] = False
             stockCache = {}
             pass
             continue
-
         if startDate < now < endDate:
-            print('doSell', now)
-            stockBuySell.doSell()
+
             if globalData['startBuy']:
                 if len(stockBuySell.codes) > 0:
                     stockBuySell.buyNext()
                 stockBuySell.cancelSell_Buy()
                 print('=============', datetime.now().timestamp() - now.timestamp())
+            print('doSell', now)
+            stockBuySell.doSell()
 
 
-        if now.strftime('%H:%M:%S') == startDate.strftime('%H:%M:%S'):
-            if stockBuySell.isTranding('000816'):
-                stockBuySell.startBuy()
+
         if (1- (datetime.now().timestamp() - now.timestamp())) > 0:
             time.sleep(1- (datetime.now().timestamp() - now.timestamp()))
     # 死循环 阻塞主线程退r
