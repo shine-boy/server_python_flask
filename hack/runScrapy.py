@@ -3,6 +3,7 @@ import datetime
 import os
 import sys
 
+
 # linux下包导入失败
 path = os.path.abspath('./..')
 sys.path.append('/home/gitlab-runner/builds/NsGaLx8a/0/root/server_python_flask')  # 会追加到列表最尾部
@@ -99,53 +100,53 @@ def do_dongfangcaifu():
 def doSched():
     print('start')
     print(datetime.datetime.now())
-    statistic = Statistic()
+    # statistic = Statistic()
     schedList = {
-        '网易云':{
-            'func': dowangyiyun,
-            'args': {
-                'type': 'interval',
-                'days': 7,
-                'misfire_grace_time': 3600,
-                'start_date': getStartTime(datetime.datetime(2021, 2, 2, 18, 0, 0),day=7)
-            }
-        },
-        '基金': {
-            'func': dofund,
-            'args': {
-                'type': 'cron',
-                'day_of_week': "0-4",
-                'misfire_grace_time': 3600,
-                'hour': '19'
-            }
-        },
-        '东方财富': {
-            'func': do_dongfangcaifu,
-            'args': {
-                'type': 'cron',
-                'day_of_week': "0-4",
-                'misfire_grace_time': 3600,
-                'hour': '8'
-            }
-        },
-        '股票统计': {
-            'func': statistic.calculate,
-            'args': {
-                'type': 'cron',
-                'day_of_week': "0-4",
-                'misfire_grace_time': 3600,
-                'hour': '18'
-            }
-        },
-        '股票汇总': {
-            'func': statistic.updateToday,
-            'args': {
-                'type': 'cron',
-                'day_of_week': "0-4",
-                'misfire_grace_time': 3600,
-                'hour': '19'
-            }
-        }
+        # '网易云':{
+        #     'func': dowangyiyun,
+        #     'args': {
+        #         'type': 'interval',
+        #         'days': 7,
+        #         'misfire_grace_time': 3600,
+        #         'start_date': getStartTime(datetime.datetime(2021, 2, 2, 18, 0, 0),day=7)
+        #     }
+        # },
+        # '基金': {
+        #     'func': dofund,
+        #     'args': {
+        #         'type': 'cron',
+        #         'day_of_week': "0-4",
+        #         'misfire_grace_time': 3600,
+        #         'hour': '19'
+        #     }
+        # },
+        # '东方财富': {
+        #     'func': do_dongfangcaifu,
+        #     'args': {
+        #         'type': 'cron',
+        #         'day_of_week': "0-4",
+        #         'misfire_grace_time': 3600,
+        #         'hour': '8'
+        #     }
+        # },
+        # '股票统计': {
+        #     'func': statistic.calculate,
+        #     'args': {
+        #         'type': 'cron',
+        #         'day_of_week': "0-4",
+        #         'misfire_grace_time': 3600,
+        #         'hour': '18'
+        #     }
+        # },
+        # '股票汇总': {
+        #     'func': statistic.updateToday,
+        #     'args': {
+        #         'type': 'cron',
+        #         'day_of_week': "0-4",
+        #         'misfire_grace_time': 3600,
+        #         'hour': '19'
+        #     }
+        # }
     }
     timeManager = TimeManager()
     for key in schedList.keys():
@@ -182,6 +183,8 @@ def runcmd():
 
     threading.Thread(target=cmd_job,args=(data,)).start()
     return ""
+
+
 
 
 

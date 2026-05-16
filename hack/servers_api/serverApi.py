@@ -71,7 +71,7 @@ class ServersApi(Request):
 
     def set_response(self, result):
         response = Response()
-        response.headers = {"Access-Control-Allow-Origin": "*"}
+        response.headers = {"Access-Control-Allow-Origin": "*", "Content-Type": "application/json;charset=UTF-8",}
         response.data = json.dumps(result, cls=DateEncoder).encode('utf-8')
         return response
 

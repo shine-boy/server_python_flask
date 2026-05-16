@@ -1,6 +1,8 @@
 # coding=utf-8
 from hack.servers_api.serverApi import ServersApi
 import datetime
+
+from hack.stock.xuntou import getHistoryData, getLastStockData, StockData
 from hack.util import isNull
 from hack.include.threadManage import threadManage
 from hack.stock import Statistic
@@ -13,6 +15,7 @@ class StockApi(ServersApi):
         self.threadManage = threadManage
         self.statistic = Statistic(self.myclient)
         self.stock = Stock()
+        stockData = StockData()
         # 根据股票编号查询对应股票数据
         @self.register('/getstock', methods=['POST', 'GET'])
         def getstock(data):
@@ -152,6 +155,23 @@ class StockApi(ServersApi):
         def update_stock(data):
             self.threadManage.add(self.stock.upDateAllStock).run()
             return self.stock.getProgress()
+
+        # 通过迅投同步所有股票数据至数据库
+        @self.register('/getStockByXuntou', methods=['POST'])
+        def getStockByXuntou(data):
+            codes = data.get('codes') or []
+            startDate = data.get('startDate')
+            print(codes)
+            return getLastStockData(codes)
+
+        # 通过迅投同步所有股票数据至数据库
+        @self.register('/getStockByXuntouHis', methods=['POST'])
+        def getStockByXuntouHis(data):
+
+            codes = data.get('codes') or []
+            startDate = data.get('startDate')
+            print(codes, '--------')
+            return stockData.getStockData(code_list=codes, start_date=startDate or '')
 
 
 

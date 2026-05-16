@@ -129,6 +129,7 @@ class Stock():
 
     def getCodeKeysMap(self,codes=None):
         codes = self.getCodes() if codes is None else codes
+        print(codes[0: 10])
         map = {}
         for code in codes:
             temp = self.getCodeBeginDate(code)
