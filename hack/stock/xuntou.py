@@ -451,7 +451,6 @@ class StockBuySell:
         if hasInfo.get(code) is not None and hasInfo[code]['has'] != hasInfo[code]['canSell']:
             return
         buyItem = stockData.getBuyItem(info, hasInfo)
-
         if buyItem:
             data = buyItem['data']
             print(code, 'buy',buyItem)
@@ -548,10 +547,9 @@ def test():
     # globalData['startBuy'] = False
 stockBuySell = None
 def runXunTou():
-    print('==================')
     now = datetime.now()
-    print(getHistoryData(['300379.SZ'], ''))
     global stockBuySell
+    global globalData
     stockBuySell = StockBuySell()
     # stockBuySell.startBuy()
     # stockBuySell.buyNext()
@@ -559,11 +557,10 @@ def runXunTou():
     # info, hasInfo = stockBuySell.getInfo()
     # print(hasInfo)
     # stockBuySell.sell(formateCode('001280'), info, hasInfo)
-    # stockBuySell.buy(formateCode('001379'))
+    # stockBuySell.buy(formateCode('600150'))
     # globalData['stockBuySell'] = stockBuySell
     # stockBuySell.hasBuyDoing('')
     # stockBuySell.doSell()
-
     startStr = ' 09:30:00'
     startCodeStr = ' 09:33:00'
     endStr = ' 15:00:00'
@@ -587,6 +584,7 @@ def runXunTou():
         if endDate < now or now < startDate or now.isoweekday() in [6, 7]:
             stockBuySell.codes = []
             globalData['startBuy'] = False
+            global stockCache
             stockCache = {}
             pass
             continue
@@ -608,7 +606,7 @@ def runXunTou():
 
 
 
-# coding:gbk
+
 
 
 class StockData:
@@ -794,7 +792,8 @@ class StockData:
 
 if __name__ == '__main__':
 # 迅投研 xtquant 示例
-    stockData = StockData()
-    stockData.updateStockDatas()
+#     stockData = StockData()
+#     stockData.updateStockDatas()
     # print([0,1][-1])
     # print(stockData.getNeedUpdateNames())
+    runXunTou()
